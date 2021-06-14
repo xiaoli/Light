@@ -16,18 +16,18 @@ class Stock(models.Model):
     code_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="证券名称")
     ipo_date = models.DateField(max_length=10, blank=True, null=True, verbose_name="上市日期")
     out_date = models.DateField(max_length=10, blank=True, null=True, verbose_name="退市日期")
-    ipo_type = models.CharField(
-        max_length=2,
+    ipo_type = models.SmallIntegerField(
         choices=TYPE_CHOICES,
         default=1,
         verbose_name="证券类型"
     )
-    ipo_status = models.CharField(
-        max_length=2,
+    ipo_status = models.SmallIntegerField(
         choices=STATUS_CHOICES,
         default=1,
         verbose_name="上市状态"
     )
+    
+    
     
     class Meta:
         verbose_name = "证券"
@@ -57,15 +57,13 @@ class KHistory(models.Model):
     preclose_price = models.CharField(max_length=255, blank=True, null=True, verbose_name="昨日收盘价")
     volume = models.CharField(max_length=255, blank=True, null=True, verbose_name="成交数量")
     amount = models.CharField(max_length=255, blank=True, null=True, verbose_name="成交金额")
-    adjust_flag = models.CharField(
-        max_length=2,
+    adjust_flag = models.SmallIntegerField(
         choices=FLAG_CHOICES,
         default=1,
         verbose_name="复权状态"
     )
     turn = models.CharField(max_length=255, blank=True, null=True, verbose_name="换手率 %")
-    trades_tatus = models.CharField(
-        max_length=2,
+    trades_tatus = models.SmallIntegerField(
         choices=STATUS_CHOICES,
         default=1,
         verbose_name="交易状态"
@@ -75,8 +73,7 @@ class KHistory(models.Model):
     psTTM = models.CharField(max_length=255, blank=True, null=True, verbose_name="滚动市销率")
     pcfNcfTTM = models.CharField(max_length=255, blank=True, null=True, verbose_name="滚动市现率")
     pbMRQ = models.CharField(max_length=255, blank=True, null=True, verbose_name="市净率")
-    is_st = models.CharField(
-        max_length=2,
+    is_st = models.SmallIntegerField(
         choices=ST_CHOICES,
         default=0,
         verbose_name="复权状态"
