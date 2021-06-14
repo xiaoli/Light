@@ -184,8 +184,7 @@ html, body {
 
 .play-panel .speed-buttons button {
   font-size: 12px;
-}
-
+}s
 /* custom scrollbar */
 ::-webkit-scrollbar {
   width: 20px;
@@ -195,14 +194,14 @@ html, body {
   background-color: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {kkkk
   background-color: #27293d;
   border-radius: 20px;
   border: 6px solid transparent;
   background-clip: content-box;
 }
 
-::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:sover {
   background-color: #708090;
 }
 
@@ -224,4 +223,8 @@ html, body {
   width: 100%;
   height: 500px;
   max-width: 100%;
+}
+
+.stock-selector {
+  margin-right: 20px;
 }
