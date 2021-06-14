@@ -27,7 +27,8 @@ class Stock(models.Model):
         verbose_name="上市状态"
     )
     
-    
+    def __str__(self):
+            return '%s' % (self.code_name)
     
     class Meta:
         verbose_name = "证券"
@@ -48,7 +49,7 @@ class KHistory(models.Model):
         (1, '是'),
         (0, '否')
     )
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, verbose_name='证券名称')
     date = models.DateField(verbose_name="交易所行情日期")
     open_price = models.CharField(max_length=255, blank=True, null=True, verbose_name="今开盘价格")
     high_price = models.CharField(max_length=255, blank=True, null=True, verbose_name="最高价")
@@ -76,7 +77,7 @@ class KHistory(models.Model):
     is_st = models.SmallIntegerField(
         choices=ST_CHOICES,
         default=0,
-        verbose_name="复权状态"
+        verbose_name="是否ST"
     )
     
     class Meta:

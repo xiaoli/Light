@@ -41,7 +41,6 @@ class Command(BaseCommand):
             #print('query_stock_basic respond  error_msg:'+rs.error_msg)
 
             # 打印结果集
-            data_list = []
             while (rs.error_code == '0') & rs.next():
                 # 获取一条记录，将记录合并在一起
                 x = rs.get_row_data()
@@ -56,5 +55,6 @@ class Command(BaseCommand):
                     s.save()
                 except Exception as e:
                     print("%s cannot be saved. %s" % (x["0"], sys.exc_info()))
-    
-
+                    
+        #### 登出系统 ####
+        bs.logout()
