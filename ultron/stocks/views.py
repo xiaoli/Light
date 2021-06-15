@@ -42,12 +42,14 @@ def get_history_by_stock(request):
             'low': h.low_price,
             'high': h.high_price,
             'close': h.close_price,
+            'pe': h.peTTM,
+            'pb': h.pbMRQ,
             'volume': h.volume
         })
     
-    json_data = json_serialize(h_list, fields=('id', 'date', 'open_price', 'high_price', 'low_price', 'close_price', 'preclose_price', 
-                    'volume', 'amount', 'adjust_flag', 'turn', 'trades_tatus', 'pctChg', 'peTTM', 'psTTM', 'pcfNcfTTM',
-                    'pbMRQ', 'is_st'))
+    #json_data = json_serialize(h_list, fields=('id', 'date', 'open_price', 'high_price', 'low_price', 'close_price', 'preclose_price', 
+    #                'volume', 'amount', 'adjust_flag', 'turn', 'trades_tatus', 'pctChg', 'peTTM', 'psTTM', 'pcfNcfTTM',
+    #                'pbMRQ', 'is_st'))
     
     return JsonResponse(data, safe=False)
     

@@ -153,10 +153,68 @@ var point_list;
       series2.dataFields.valueY = "volume";
       series2.yAxis = valueAxis2;
       series2.tooltipText = "{valueY.value}";
-      series2.name = "Series 2";
+      series2.name = "成交数量";
       // volume should be summed
       series2.groupFields.valueY = "sum";
       series2.defaultState.transitionDuration = 0;
+      
+      // PE 展示
+      var valueAxis3 = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis3.tooltip.disabled = true;
+      // height of axis
+      valueAxis3.height = am4core.percent(35);
+      valueAxis3.zIndex = 5
+      // this makes gap between panels
+      valueAxis3.marginTop = 30;
+      valueAxis3.renderer.baseGrid.disabled = true;
+      valueAxis3.renderer.inside = true;
+      valueAxis3.renderer.labels.template.verticalCenter = "bottom";
+      valueAxis3.renderer.labels.template.padding(2, 2, 2, 2);
+      //valueAxis.renderer.maxLabelPosition = 0.95;
+      valueAxis3.renderer.fontSize = "0.8em"
+
+      valueAxis3.renderer.gridContainer.background.fill = am4core.color("#000000");
+      valueAxis3.renderer.gridContainer.background.fillOpacity = 0.05;
+      
+      var series3 = chart.series.push(new am4charts.ColumnSeries());
+      series3.dataFields.dateX = "date";
+      series3.clustered = false;
+      series3.dataFields.valueY = "pe";
+      series3.yAxis = valueAxis3;
+      series3.tooltipText = "{valueY.value}";
+      series3.name = "滚动市盈率 peTTM";
+      // volume should be summed
+      series3.groupFields.valueY = "sum";
+      series3.defaultState.transitionDuration = 0;
+      
+      // Pb 展示
+      var valueAxis4 = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis4.tooltip.disabled = true;
+      // height of axis
+      valueAxis4.height = am4core.percent(35);
+      valueAxis4.zIndex = 5
+      // this makes gap between panels
+      valueAxis4.marginTop = 30;
+      valueAxis4.renderer.baseGrid.disabled = true;
+      valueAxis4.renderer.inside = true;
+      valueAxis4.renderer.labels.template.verticalCenter = "bottom";
+      valueAxis4.renderer.labels.template.padding(2, 2, 2, 2);
+      //valueAxis.renderer.maxLabelPosition = 0.95;
+      valueAxis4.renderer.fontSize = "0.8em"
+
+      valueAxis4.renderer.gridContainer.background.fill = am4core.color("#000000");
+      valueAxis4.renderer.gridContainer.background.fillOpacity = 0.05;
+      
+      var series4 = chart.series.push(new am4charts.ColumnSeries());
+      series4.dataFields.dateX = "date";
+      series4.clustered = false;
+      series4.dataFields.valueY = "pb";
+      series4.yAxis = valueAxis4;
+      series4.tooltipText = "{valueY.value}";
+      series4.name = "滚动市现率 pbMRQ";
+      // volume should be summed
+      series4.groupFields.valueY = "sum";
+      series4.defaultState.transitionDuration = 0;
 
       chart.cursor = new am4charts.XYCursor();
 
