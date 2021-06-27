@@ -71,6 +71,7 @@ class KHistory(models.Model):
     )
     pctChg = models.CharField(max_length=255, blank=True, null=True, verbose_name="涨跌幅（百分比）")
     peTTM = models.CharField(max_length=255, blank=True, null=True, verbose_name="滚动市盈率")
+    avgPE = models.CharField(max_length=255, blank=True, null=True, verbose_name="近十年滚动市盈率")
     psTTM = models.CharField(max_length=255, blank=True, null=True, verbose_name="滚动市销率")
     pcfNcfTTM = models.CharField(max_length=255, blank=True, null=True, verbose_name="滚动市现率")
     pbMRQ = models.CharField(max_length=255, blank=True, null=True, verbose_name="市净率")
