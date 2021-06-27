@@ -20,6 +20,9 @@ class Command(BaseCommand):
         #### 四个关注指标 ####
         # close 当日收盘价
         # peTTM 滚动市盈率
+        
+        total_stocks = 0
+        total_money = 0
 
         my_stocks = Stock.objects.all()
 
@@ -95,3 +98,8 @@ class Command(BaseCommand):
                     d = d + timedelta(days=7)
                     
             print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*float(h.open_price), money+s_count*float(h.open_price)))
+            total_money += money
+            total_stocks += s_count*float(h.open_price)
+            
+        print("======")
+        print("总投入%f 总市值%f 总现钞%f 总股票价值%f" % (100000*my_stocks.count(), total_money+total_stocks, total_money, total_stocks) )
