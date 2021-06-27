@@ -20,19 +20,19 @@ class Command(BaseCommand):
         #### 四个关注指标 ####
         # close 当日收盘价
         # peTTM 滚动市盈率
-        
-        # 总资本
-        money = 100000
-        # 持有股票数量
-        s_count = 0
-        # 开启交易日 2019.01.01 是周二，每周二交易
-        d = date.fromisoformat("2019-01-01")
-        # 实际交易日
-        dz = date.fromisoformat("2019-01-01")
 
         my_stocks = Stock.objects.all()
 
         for s in my_stocks:
+            
+            # 总资本
+            money = 100000
+            # 持有股票数量
+            s_count = 0
+            # 开启交易日 2019.01.01 是周二，每周二交易
+            d = date.fromisoformat("2019-01-01")
+            # 实际交易日
+            dz = date.fromisoformat("2019-01-01")
         
             h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s)
             
@@ -94,4 +94,4 @@ class Command(BaseCommand):
                     # 调整到下周二
                     d = d + timedelta(days=7)
                     
-            print("总资金%f 剩余股票%d" % (money, s_count))
+            print("%s 总资金%f 剩余股票%d" % (h.stock.code_name, money, s_count))
