@@ -30,16 +30,10 @@ class Command(BaseCommand):
                 print(h.date)
                 end_date = h.date#date.fromisoformat(h.date)
                 start_date = end_date.replace( year = end_date.year - 10 )
-                avg_pe = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).aggregate(Avg('peTTM'))
-                print(avg_pe.get('peTTM__avg'))
+                pe = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).aggregate(Avg('peTTM'), Max('peTTM'), Min('peTTM'))
+                print(pe)
                 
-                p = avg_pe.get('peTTM__avg')
-                
-                h.avg_pe = p
+                h.maxPE = pe.get('peTTM__max')
+                h.minPE = pe.get('peTTM__min')
                 h.save()
                 
-                if p > float(h.peTTM):
-                    print("低估")
-                    
-                elif p < float(h.peTTM):
-                    print("高估")
