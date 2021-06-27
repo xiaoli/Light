@@ -94,4 +94,4 @@ class Command(BaseCommand):
                     # 调整到下周二
                     d = d + timedelta(days=7)
                     
-            print("%s 总资金%f 剩余股票%d" % (h.stock.code_name, money, s_count))
+            print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*float(h.open_price), money+s_count*float(h.open_price)))
