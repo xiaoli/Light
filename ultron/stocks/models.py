@@ -51,11 +51,11 @@ class KHistory(models.Model):
     )
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE, verbose_name='证券名称')
     date = models.DateField(verbose_name="交易所行情日期")
-    open_price = models.FloatField(null=True, verbose_name="今开盘价格")
-    high_price = models.FloatField(null=True, verbose_name="最高价")
-    low_price = models.FloatField(null=True, verbose_name="最低价")
-    close_price = models.FloatField(null=True, verbose_name="今收盘价")
-    preclose_price = models.FloatField(null=True, verbose_name="昨日收盘价")
+    open_price = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="今开盘价格")
+    high_price = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="最高价")
+    low_price = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="最低价")
+    close_price = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="今收盘价")
+    preclose_price = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="昨日收盘价")
     volume = models.CharField(max_length=255, blank=True, null=True, verbose_name="成交数量")
     amount = models.CharField(max_length=255, blank=True, null=True, verbose_name="成交金额")
     adjust_flag = models.SmallIntegerField(
@@ -69,13 +69,13 @@ class KHistory(models.Model):
         default=1,
         verbose_name="交易状态"
     )
-    pctChg = models.FloatField(null=True, verbose_name="涨跌幅（百分比）")
-    peTTM = models.FloatField(null=True, verbose_name="滚动市盈率")
-    maxPE = models.FloatField(null=True, verbose_name="近十年最高市盈率")
-    minPE = models.FloatField(null=True, verbose_name="近十年最低市盈率")
-    psTTM = models.FloatField(null=True, verbose_name="滚动市销率")
-    pcfNcfTTM = models.FloatField(null=True, verbose_name="滚动市现率")
-    pbMRQ = models.FloatField(null=True, verbose_name="市净率")
+    pctChg = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="涨跌幅（百分比）")
+    peTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市盈率")
+    maxPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年最高市盈率")
+    minPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年最低市盈率")
+    psTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市销率")
+    pcfNcfTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市现率")
+    pbMRQ = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="市净率")
     is_st = models.SmallIntegerField(
         choices=ST_CHOICES,
         default=0,
