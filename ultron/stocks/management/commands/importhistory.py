@@ -64,7 +64,7 @@ class Command(BaseCommand):
                     k.psTTM = str(x[14])
                     k.pcfNcfTTM = str(x[15])
                     k.pbMRQ = str(x[16])
-                    k.is_st = int(x[17])
+                    k.is_st = int(x[17] if x[17] else 0)
                     k.save()
                 except Exception as e:
                     print("%s %s cannot be saved. %s" % (k[1], k[0], sys.exc_info()))
