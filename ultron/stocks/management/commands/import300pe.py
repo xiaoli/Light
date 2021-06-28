@@ -15,10 +15,12 @@ class Command(BaseCommand):
         
         with open('300.csv')as f:
             f_csv = csv.reader(f)
+            i = 0
             for row in f_csv:
-                if len(row) > 0:
+                if i > 0 and len(row) > 0:
                     print(row[0], row[4])
-                    khs = KHistory.objects.filter(code="sh.000300", date=row[0])
+                    khs = KHistory.objects.filter(stock__code="sh.000300", date=row[0])
                     for k in khs:
                         k.peTTM = str(row[4])
-                        k.save()            
+                        k.save()
+                i += 1
