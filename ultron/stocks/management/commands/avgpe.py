@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 print(h.date)
                 end_date = h.date#date.fromisoformat(h.date)
                 start_date = end_date.replace( year = end_date.year - 10 )
-                pe = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).aggregate(Avg('peTTM'), Max('peTTM'), Min('peTTM'))
+                pe = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).exclude(peTTM=0).aggregate(Avg('peTTM'), Max('peTTM'), Min('peTTM'))
                 print(pe)
                 
                 h.maxPE = pe.get('peTTM__max')
