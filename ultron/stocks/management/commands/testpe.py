@@ -25,6 +25,7 @@ class Command(BaseCommand):
         total_money = 0
 
         my_stocks = Stock.objects.all()
+        print("股票, 低估/高估, 持有股票, 持有资金, 交易日, 交易价格")
 
         for s in my_stocks:
             
@@ -53,7 +54,7 @@ class Command(BaseCommand):
                     bottom_pe = min_pe + pe_range * 0.3
             
                     # 交易价格
-                    price = float(h.open_price)
+                    price = float(h.open_price.normalize())
                     #print(top_pe, bottom_pe)
             
                     if pe <= bottom_pe:
@@ -73,33 +74,34 @@ class Command(BaseCommand):
                             c = floor((money * 0.75) / price)
                             s_count += c
                             money -= c*price
-                        #print("低估：%s 股票%f 资金%f 交易日%s 交易价格%s" % (h.stock.code_name, s_count, money, h.date, price))
+                        print("%s, 低估, %f, %f, %s, %s" % (h.stock.code_name, s_count, money, h.date, price))
                     elif pe >= top_pe:
                         if pe >= max_pe - pe_range * 0.05:
-                            c = s_count*0.95
+                            c = floor(s_count*0.95)
                             s_count -= c
                             money += c*price
                         elif pe >= max_pe - pe_range * 0.10:
-                            c = s_count*0.90
+                            c = floor(s_count*0.90)
                             s_count -= c
                             money += c*price
                         elif pe >= max_pe - pe_range * 0.20:
-                            c = s_count*0.80
+                            c = floor(s_count*0.80)
                             s_count -= c
                             money += c*price
                         elif pe >= max_pe - pe_range * 0.30:
-                            c = s_count*0.70
+                            c = floor(s_count*0.70)
                             s_count -= c
                             money += c*price
-                        #print("高估：%s 股票%f 资金%f 交易日%s 交易价格%s" % (h.stock.code_name, s_count, money, h.date, price))
+                        print("%s, 高估, %f, %f, %s, %s" % (h.stock.code_name, s_count, money, h.date, price))
                 
                     # 更新下一次检查日
                     # 调整到下周二
                     d = d + timedelta(days=7)
                     
-            print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*float(h.open_price), money+s_count*float(h.open_price)))
+            print("===投资结果===")
+            print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
             total_money += money
-            total_stocks += s_count*float(h.open_price)
+            total_stocks += s_count
             
-        print("======")
+        print("===总投资结果===")
         print("总投入%f 总市值%f 总现钞%f 总股票价值%f" % (100000*my_stocks.count(), total_money+total_stocks, total_money, total_stocks) )
