@@ -1,0 +1,6 @@
+# 2021-06-29 SQL手动执行
+update stocks_khistory set pbMRQ = 0 where pbMRQ = '';
+update stocks_khistory set pctChg = 0 where pctChg = '';
+update stocks_khistory set peTTM = 0 where peTTM = '';
+update stocks_khistory set psTTM = 0 where psTTM = '';
+update stocks_khistory set pcfNcfTTM = 0 where pcfNcfTTM = '';

@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row content">
+    <!--<div class="history-sidebar"> 
+        <div class="play-panel">
+            <div class="car-chooser">
+                <div class="row mb-3">
+                    <label for="multi-vehicle" class="label">证券名称</label>
+                    <div class="col-sm-12">
+                        <select id="stocks" class="form-select" onchange="calculate()">
+                		{% for s in s_list %}
+                            <option id="{{s.id}}">{{s.code_name}}</option>
+                		{% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <label for="datepicker" class="label">起止日期</label>
+                    <div class="col-sm-6">
+                      <input id="start" class="input form-control" type="text" placeholder="选择日期">
+                    </div>
+                    <div class="col-sm-6">
+                      <input id="end" class="input form-control" type="text" placeholder="选择日期">
+                    </div>
+                </div>
+                
+                <div class="col-md-12 mb-3 text-center">
+                    <button type="button" class="btn btn-info pull-right" onclick="calculate()">查询</button>
+                </div>
+              
+            </div>
+        
+        </div>      
+    </div>-->
+    
+    <div class="col sideright chart">
+        <div id="chartdiv"></div>
+        <div id="controls" style="width: 100%; overflow: hidden;">
+            <div style="float: left; margin-left: 15px;">
+                起: <input type="text" id="fromfield" class="amcharts-input" />
+                止: <input type="text" id="tofield" class="amcharts-input" />
+            </div>
+            <div style="float: right; margin-right: 15px;">
+                <button id="b1m" class="amcharts-input">1m</button>
+                <button id="b3m" class="amcharts-input">3m</button>
+                <button id="b6m" class="amcharts-input">6m</button>
+                <button id="b1y" class="amcharts-input">1y</button>
+                <button id="bytd" class="amcharts-input">YTD</button>
+                <button id="bmax" class="amcharts-input">MAX</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type = "text/javascript">
+moment.locale('zh-cn');
+
+var history_list;
+var point_list;
+
+  function calculate() {
+      
+      var sid = $('#stocks').find('option:checked').attr('id');
+      
+//      am4core.ready(function() {
+
+      // Themes begin
+      am4core.useTheme(am4themes_frozen);
+      am4core.useTheme(am4themes_animated);
+      // Themes end
+
+      // Create chart
+      var chart = am4core.create("chartdiv", am4charts.XYChart);
+      chart.padding(0, 15, 0, 15);
+
+      // Load data
+      chart.dataSource.url = "/api/v1/get_history_by_stock/?sid=" + sid;
+
+      // the following line makes value axes to be arranged vertically.
+      chart.leftAxesContainer.layout = "vertical";
+
+      // uncomment this line if you want to change order of axes
+      //chart.bottomAxesContainer.reverseOrder = true;
+
+      var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+      dateAxis.renderer.grid.template.location = 0;
+      dateAxis.renderer.ticks.template.length = 8;
+      dateAxis.renderer.ticks.template.strokeOpacity = 0.1;
+      dateAxis.renderer.grid.template.disabled = true;
+      dateAxis.renderer.ticks.template.disabled = false;
+      dateAxis.renderer.ticks.template.strokeOpacity = 0.2;
+      dateAxis.renderer.minLabelPosition = 0.01;
+      dateAxis.renderer.maxLabelPosition = 0.99;
+      dateAxis.keepSelection = true;
+      dateAxis.minHeight = 30;
+
+      dateAxis.groupData = true;
+      dateAxis.minZoomCount = 5;
+
+      // these two lines makes the axis to be initially zoomed-in
+      // dateAxis.start = 0.7;
+      // dateAxis.keepSelection = true;
+
+      var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis.tooltip.disabled = true;
+      valueAxis.zIndex = 1;
+      valueAxis.renderer.baseGrid.disabled = true;
+      // height of axis
+      valueAxis.height = am4core.percent(65);
+
+      valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
+      valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
+      valueAxis.renderer.inside = true;
+      valueAxis.renderer.labels.template.verticalCenter = "bottom";
+      valueAxis.renderer.labels.template.padding(2, 2, 2, 2);
+
+      //valueAxis.renderer.maxLabelPosition = 0.95;
+      valueAxis.renderer.fontSize = "0.8em"
+
+      var series = chart.series.push(new am4charts.CandlestickSeries());
+      series.dataFields.dateX = "date";
+      series.dataFields.openValueY = "open";
+      series.dataFields.valueY = "close";
+      series.dataFields.lowValueY = "low";
+      series.dataFields.highValueY = "high";
+      series.clustered = false;
+      series.tooltipText = "开盘价: {openValueY.value}\n最低价: {lowValueY.value}\n最高价: {highValueY.value}\n收盘价: {valueY.value}";
+      series.name = "MSFT";
+      series.defaultState.transitionDuration = 0;
+
+      var valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis2.tooltip.disabled = true;
+      // height of axis
+      valueAxis2.height = am4core.percent(35);
+      valueAxis2.zIndex = 3
+      // this makes gap between panels
+      valueAxis2.marginTop = 30;
+      valueAxis2.renderer.baseGrid.disabled = true;
+      valueAxis2.renderer.inside = true;
+      valueAxis2.renderer.labels.template.verticalCenter = "bottom";
+      valueAxis2.renderer.labels.template.padding(2, 2, 2, 2);
+      //valueAxis.renderer.maxLabelPosition = 0.95;
+      valueAxis2.renderer.fontSize = "0.8em"
+
+      valueAxis2.renderer.gridContainer.background.fill = am4core.color("#000000");
+      valueAxis2.renderer.gridContainer.background.fillOpacity = 0.05;
+
+      var series2 = chart.series.push(new am4charts.ColumnSeries());
+      series2.dataFields.dateX = "date";
+      series2.clustered = false;
+      series2.dataFields.valueY = "volume";
+      series2.yAxis = valueAxis2;
+      series2.tooltipText = "{valueY.value}";
+      series2.name = "成交数量";
+      // volume should be summed
+      series2.groupFields.valueY = "sum";
+      series2.defaultState.transitionDuration = 0;
+      
+      // PE 展示
+      var valueAxis3 = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis3.tooltip.disabled = true;
+      // height of axis
+      valueAxis3.height = am4core.percent(35);
+      valueAxis3.zIndex = 5
+      // this makes gap between panels
+      valueAxis3.marginTop = 30;
+      valueAxis3.renderer.baseGrid.disabled = true;
+      valueAxis3.renderer.inside = true;
+      valueAxis3.renderer.labels.template.verticalCenter = "bottom";
+      valueAxis3.renderer.labels.template.padding(2, 2, 2, 2);
+      //valueAxis.renderer.maxLabelPosition = 0.95;
+      valueAxis3.renderer.fontSize = "0.8em"
+
+      valueAxis3.renderer.gridContainer.background.fill = am4core.color("#000000");
+      valueAxis3.renderer.gridContainer.background.fillOpacity = 0.05;
+      
+      var series3 = chart.series.push(new am4charts.ColumnSeries());
+      series3.dataFields.dateX = "date";
+      series3.clustered = false;
+      series3.dataFields.valueY = "pe";
+      series3.yAxis = valueAxis3;
+      series3.tooltipText = "{valueY.value}";
+      series3.name = "滚动市盈率 peTTM";
+      // volume should be summed
+      series3.groupFields.valueY = "sum";
+      series3.defaultState.transitionDuration = 0;
+      
+      // Pb 展示
+      var valueAxis4 = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis4.tooltip.disabled = true;
+      // height of axis
+      valueAxis4.height = am4core.percent(35);
+      valueAxis4.zIndex = 5
+      // this makes gap between panels
+      valueAxis4.marginTop = 30;
+      valueAxis4.renderer.baseGrid.disabled = true;
+      valueAxis4.renderer.inside = true;
+      valueAxis4.renderer.labels.template.verticalCenter = "bottom";
+      valueAxis4.renderer.labels.template.padding(2, 2, 2, 2);
+      //valueAxis.renderer.maxLabelPosition = 0.95;
+      valueAxis4.renderer.fontSize = "0.8em"
+
+      valueAxis4.renderer.gridContainer.background.fill = am4core.color("#000000");
+      valueAxis4.renderer.gridContainer.background.fillOpacity = 0.05;
+      
+      var series4 = chart.series.push(new am4charts.ColumnSeries());
+      series4.dataFields.dateX = "date";
+      series4.clustered = false;
+      series4.dataFields.valueY = "pb";
+      series4.yAxis = valueAxis4;
+      series4.tooltipText = "{valueY.value}";
+      series4.name = "滚动市现率 pbMRQ";
+      // volume should be summed
+      series4.groupFields.valueY = "sum";
+      series4.defaultState.transitionDuration = 0;
+
+      chart.cursor = new am4charts.XYCursor();
+
+      var scrollbarX = new am4charts.XYChartScrollbar();
+
+      var sbSeries = chart.series.push(new am4charts.LineSeries());
+      sbSeries.dataFields.valueY = "close";
+      sbSeries.dataFields.dateX = "date";
+      scrollbarX.series.push(sbSeries);
+      sbSeries.disabled = true;
+      scrollbarX.marginBottom = 20;
+      chart.scrollbarX = scrollbarX;
+      scrollbarX.scrollbarChart.xAxes.getIndex(0).minHeight = undefined;
+
+
+
+      /**
+       * Set up external controls
+       */
+
+      // Date format to be used in input fields
+      var inputFieldFormat = "yyyy-MM-dd";
+
+      document.getElementById("b1m").addEventListener("click", function() {
+        var max = dateAxis.groupMax["day1"];
+        var date = new Date(max);
+        am4core.time.add(date, "month", -1);
+        zoomToDates(date);
+      });
+
+      document.getElementById("b3m").addEventListener("click", function() {
+        var max = dateAxis.groupMax["day1"];
+        var date = new Date(max);
+        am4core.time.add(date, "month", -3);
+        zoomToDates(date);
+      });
+
+      document.getElementById("b6m").addEventListener("click", function() {
+        var max = dateAxis.groupMax["day1"];
+        var date = new Date(max);
+        am4core.time.add(date, "month", -6);
+        zoomToDates(date);
+      });
+
+      document.getElementById("b1y").addEventListener("click", function() {
+        var max = dateAxis.groupMax["day1"];
+        var date = new Date(max);
+        am4core.time.add(date, "year", -1);
+        zoomToDates(date);
+      });
+
+      document.getElementById("bytd").addEventListener("click", function() {
+        var max = dateAxis.groupMax["day1"];
+        var date = new Date(max);
+        am4core.time.round(date, "year", 1);
+        zoomToDates(date);
+      });
+
+      document.getElementById("bmax").addEventListener("click", function() {
+        var min = dateAxis.groupMin["day1"];
+        var date = new Date(min);
+        zoomToDates(date);
+      });
+
+      dateAxis.events.on("selectionextremeschanged", function() {
+        updateFields();
+      });
+
+      dateAxis.events.on("extremeschanged", updateFields);
+      
+      // 时间组件
+  var startDate,
+      endDate,
+      updateStartDate = function() {
+          startPicker.setStartRange(startDate);
+          endPicker.setStartRange(startDate);
+          endPicker.setMinDate(startDate);
+      },
+      updateEndDate = function() {
+          startPicker.setEndRange(endDate);
+          startPicker.setMaxDate(endDate);
+          endPicker.setEndRange(endDate);
+      },
+      startPicker = new Pikaday({
+          field: document.getElementById('fromfield'),
+  //        theme: 'dark-theme',
+          minDate: new Date(1990, 12, 31),
+          maxDate: new Date(2021, 12, 31),
+          onSelect: function() {
+              startDate = this.getDate();
+              updateStartDate();
+              updateZoom();
+          }
+      }),
+      endPicker = new Pikaday({
+          field: document.getElementById('tofield'),
+  //        theme: 'dark-theme',
+          minDate: new Date(1990, 12, 31),
+          maxDate: new Date(2021, 12, 31),
+          onSelect: function() {
+              endDate = this.getDate();
+              updateEndDate();
+              updateZoom();
+          }
+      }),
+      _startDate = startPicker.getDate(),
+      _endDate = endPicker.getDate();
+
+      if (_startDate) {
+          startDate = _startDate;
+          updateStartDate();
+      }
+
+      if (_endDate) {
+          endDate = _endDate;
+          updateEndDate();
+      }
+
+      // 更新时间选择框
+      function updateFields() {
+        var minZoomed = dateAxis.minZoomed + am4core.time.getDuration(dateAxis.mainBaseInterval.timeUnit, dateAxis.mainBaseInterval.count) * 0.5;
+        document.getElementById("fromfield").value = chart.dateFormatter.format(minZoomed, inputFieldFormat);
+        document.getElementById("tofield").value = chart.dateFormatter.format(new Date(dateAxis.maxZoomed), inputFieldFormat);
+        
+        startPicker.setDate(document.getElementById("fromfield").value);
+        endPicker.setDate(document.getElementById("tofield").value);
+      }
+
+      document.getElementById("fromfield").addEventListener("keyup", updateZoom);
+      document.getElementById("tofield").addEventListener("keyup", updateZoom);
+
+      var zoomTimeout;
+      function updateZoom() {
+        if (zoomTimeout) {
+          clearTimeout(zoomTimeout);
+        }
+        zoomTimeout = setTimeout(function() {
+          var start = document.getElementById("fromfield").value;
+          var end = document.getElementById("tofield").value;
+          if ((start.length < inputFieldFormat.length) || (end.length < inputFieldFormat.length)) {
+            return;
+          }
+          var start_date = chart.dateFormatter.parse(start, inputFieldFormat);
+          var end_date = chart.dateFormatter.parse(end, inputFieldFormat);
+
+          if (start_date && end_date) {
+            dateAxis.zoomToDates(startDate, end_date);
+          }
+        }, 500);
+      }
+
+      function zoomToDates(date) {
+        var min = dateAxis.groupMin["day1"];
+        var max = dateAxis.groupMax["day1"];
+        dateAxis.keepSelection = true;
+        //dateAxis.start = (date.getTime() - min)/(max - min);
+        //dateAxis.end = 1;
+
+        dateAxis.zoom({start:(date.getTime() - min)/(max - min), end:1});
+      }
+
+ //     }); // end am4core.ready()   
+  
+  }
+  
+  // 初次启动
+  calculate();
+</script>
+{% endblock %}

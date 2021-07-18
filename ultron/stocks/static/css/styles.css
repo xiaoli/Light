@@ -1,0 +1,230 @@
+html, body {
+  font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  height: 100%;
+}
+
+.navbar {
+    background: #27293d;
+    border-bottom: 1px solid #353a53;
+    box-shadow: 18px 5px 10px #222334;
+}
+
+.navbar-brand {
+  margin: 0 20px;
+    width: 100%;
+}
+
+.navbar-brand .slash {
+  font-weight: 400;
+  margin: auto 10px;
+}
+
+.navbar span {
+    line-height: 50px;
+    font-size: 20px;
+    font-weight: 900;
+    color: #fff;
+    margin: auto 0;
+}
+
+.navbar-bottom {
+  width: 100%;
+  height: 10px;
+  background: #27293d;
+}
+
+.row {
+    background: #27293d;
+}
+
+.container {
+    background: #27293d;
+    height: 100%;
+}
+
+#map-container {
+    width: 100%;
+    height: 100%;
+}
+
+.content-window-card {
+  font-size: 12px;
+  width: 300px;
+  word-wrap:break-word;
+  word-break:break-all;
+}
+
+.car-history-card {
+  font-size: 12px;
+  width: 230px;
+  word-wrap:break-word;
+  word-break:break-all;
+}
+
+.car-history-card .input-item {
+  line-height: 16px;
+}
+
+/* 版本号 */
+.navbar-brand .version {
+    margin: 0 5px;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.car-count {
+  font-weight: 300;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #353a53;
+}
+
+/* logo */
+.logo {
+    margin: auto 0;
+    padding-right: 45px;
+    border-right: 1px solid #353a53;
+}
+
+.logo img {
+    width: 180px;
+    text-align: center;
+    vertical-align:middle;
+}
+
+.container.content {
+  padding-right: 0;
+}
+
+/* sidebar */
+.row .sidebar, .row .sidebar-right {
+    background: #27293d;
+    color: #fff;
+    padding: 0 20px;
+}
+
+.sidebar {
+  margin-top: 10px;
+  width: 250px;
+  white-space: nowrap;
+  overflow-y:scroll;
+  height: calc(100vh - 100px);
+}
+
+.sideright {
+  padding: 0;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+.sidebar .car-card {
+  height: 80px;
+}
+
+.car-card:not(:last-child) {
+  border-bottom: 1px solid #353a53;
+}
+
+.car-info {
+  width: 100%;
+  text-align: left;
+  margin: auto 0;
+  padding-left: 18%;
+}
+
+.car-info .plate-number, .car-info .driver {
+  font-size: 12px;
+}
+
+.sidebar .car-img {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar .car-card img {
+  width: 40px;
+}
+
+/* 轨迹回放 */
+.history-sidebar {
+  margin-top: 10px;
+  width: 280px;
+  white-space: nowrap;
+  overflow:hidden;
+  height: calc(100vh - 100px);
+}
+
+.car-chooser {
+  font-weight: 300;
+  font-size: 12px;
+  text-align: left;
+  margin-top: 10px;
+  padding-bottom: 10px;
+}
+
+.car-chooser label {
+  font-weight: 400;
+  font-size: 14px;
+  color: #fff;
+}
+
+.play-panel {
+  margin: 10px 0;
+  border-bottom: 1px solid #353a53;
+  padding-bottom: 10px;
+  height: 100%;
+}
+
+.play-panel .speed-buttons button {
+  font-size: 12px;
+}s
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {kkkk
+  background-color: #27293d;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:sover {
+  background-color: #708090;
+}
+
+.day-stats {
+    border-top: 1px solid #353a53;
+    padding-top:10px;
+    color: #fff;
+    text-align: center;
+}
+
+/* Chart */
+.chart {
+    background-color: #fff;
+    width: 100%;
+    height: calc(100vh - 100px);
+}
+
+#chartdiv {
+  width: 100%;
+  height: 500px;
+  max-width: 100%;
+}
+
+.stock-selector {
+  margin-right: 20px;
+}
