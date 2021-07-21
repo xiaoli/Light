@@ -13,16 +13,16 @@ df = pro.trade_cal(exchange='',
 print(df)
 
 # 获取股票价格
-df = ts.pro_bar(ts_code='688229.SH', start_date='20210526', end_date='20210526')
+df = ts.pro_bar(ts_code='000300.SH', start_date='20210721', end_date='20210721')
 print(df)
 
 # 获取股票上午收盘价
-df = ts.pro_bar(ts_code='688229.SH', freq='1min', start_date='2021-05-26 11:30:00', end_date='2021-05-26 11:30:00')
-print(df)
+#df = ts.pro_bar(ts_code='688229.SH', freq='1min', start_date='2021-05-26 11:30:00', end_date='2021-05-26 11:30:00')
+#print(df)
 
 # 获取股票下午收盘价
-df = ts.pro_bar(ts_code='688229.SH', freq='1min', start_date='2021-05-26 15:00:00', end_date='2021-05-26 15:00:00')
-print(df)
+#df = ts.pro_bar(ts_code='688229.SH', freq='1min', start_date='2021-05-26 15:00:00', end_date='2021-05-26 15:00:00')
+#print(df)
 
 #print(dir(df))
 

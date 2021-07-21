@@ -12,7 +12,7 @@ class Stock(models.Model):
         (0, '退市')
     )
     
-    code = models.CharField(max_length=255, blank=True, null=True, verbose_name="证券代码")
+    code = models.CharField(max_length=255, unique=True, blank=True, null=True, verbose_name="证券代码")
     code_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="证券名称")
     ipo_date = models.DateField(max_length=10, blank=True, null=True, verbose_name="上市日期")
     out_date = models.DateField(max_length=10, blank=True, null=True, verbose_name="退市日期")
