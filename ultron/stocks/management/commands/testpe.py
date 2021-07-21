@@ -46,7 +46,7 @@ class Command(BaseCommand):
         today = date.today()
 
         my_stocks = Stock.objects.all()
-        print("股票, 低估/高估, 持有股票, 持有资金, 交易日, 当日价格, 资金+股票")
+        print("股票, 低估/高估, 持有股票, 持有资金, 交易日, 当日价格, pe, max(pe), min(pe), 资金+股票")
 
         for s in my_stocks:
             
@@ -104,7 +104,7 @@ class Command(BaseCommand):
                             c = floor((money * 0.75) / price)
                             s_count += c
                             money -= c*price
-                        print("%s, 低估, %f, %f, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, money+s_count*price))
+                        print("%s, 低估, %f, %f, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, h.peTTM, h.maxPE, h.minPE, money+s_count*price))
                         draw_value_list.append(money+s_count*price)
                         draw_date_list.append(h.date)
                     elif pe >= top_pe:
@@ -124,7 +124,7 @@ class Command(BaseCommand):
                             c = floor(s_count*0.70)
                             s_count -= c
                             money += c*price
-                        print("%s, 高估, %f, %f, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, money+s_count*price))
+                        print("%s, 高估, %f, %f, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, h.peTTM, h.maxPE, h.minPE, money+s_count*price))
                         draw_value_list.append(money+s_count*price)
                         draw_date_list.append(h.date)
                 
