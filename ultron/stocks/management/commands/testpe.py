@@ -42,18 +42,20 @@ class Command(BaseCommand):
         
         total_stocks = 0
         total_money = 0
+        total_stocks_value = 0
         
         today = date.today()
 
+        #my_stocks = Stock.objects.filter(code='sh.000300')
         my_stocks = Stock.objects.all()
-        print("股票, 日期, 低估/高估, P/E, Max P/E, Min P/E, 当日股价, 股持仓, 股价值, 现金, 股比例, 现金比例, 总价值")
+        print("股票, 日期, 低估/高估, 具体分档, P/E, Max P/E, Min P/E, 当日股价, 股持仓, 股价值, 现金, 股比例, 现金比例, 总价值")
 
         for s in my_stocks:
             
             # 固定成本
-            cost = 100000
+            cost = 10000000
             # 总起始资本
-            money = 100000
+            money = 10000000
             # 持有股票数量
             s_count = 0
             # 开启交易日 2019.01.01 是周二，每周二交易
@@ -89,55 +91,111 @@ class Command(BaseCommand):
                     
                     # 当日开盘总资产
                     day_value = money+s_count*price
+                    
+                    # PE 档位
+                    pe_rank = ''
             
                     if pe <= bottom_pe:
                         if pe <= min_pe + pe_range * 0.05:
-                            c = floor((money * 0.98) / price)
-                            s_count += c
-                            money -= c*price
+                            pe_rank = '后5%及以上'
+                            c = floor((day_value * 0.98) / price)
+                            if c > s_count:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                            else:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                                
                         elif pe <= min_pe + pe_range * 0.10:
-                            c = floor((money * 0.93) / price)
-                            s_count += c
-                            money -= c*price
+                            pe_rank = '后10%至5%'
+                            c = floor((day_value * 0.93) / price)
+                            if c > s_count:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                            else:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                            
                         elif pe <= min_pe + pe_range * 0.20:
-                            c = floor((money * 0.85) / price)
-                            s_count += c
-                            money -= c*price
+                            pe_rank = '后20%至10%'
+                            c = floor((day_value * 0.85) / price)
+                            if c > s_count:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                            else:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                                
                         elif pe <= min_pe + pe_range * 0.30:
-                            c = floor((money * 0.75) / price)
-                            s_count += c
-                            money -= c*price
+                            pe_rank = '后30%至20%'
+                            c = floor((day_value * 0.75) / price)
+                            if c > s_count:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                            else:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                                
                         # 当日收盘总资产
                         day_value = money+s_count*price
-                        print("%s, %s, 低, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        print("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                         draw_value_list.append(money+s_count*price)
                         draw_date_list.append(h.date)
+                        
                     elif pe >= top_pe:
                         if pe >= max_pe - pe_range * 0.05:
-                            c = floor(s_count*0.95)
-                            s_count -= c
-                            money += c*price
+                            pe_rank = '前5%及以上'
+                            c = floor((day_value * 0.05) / price)
+                            #print(c, day_value, "=========1")
+                            if c < s_count:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                            else:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                                
                         elif pe >= max_pe - pe_range * 0.10:
-                            c = floor(s_count*0.90)
-                            s_count -= c
-                            money += c*price
+                            pe_rank = '前10%至5%'
+                            c = floor((day_value * 0.10) / price)
+                            #print(c, day_value, "=========2")
+                            if c < s_count:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                            else:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                            
                         elif pe >= max_pe - pe_range * 0.20:
-                            c = floor(s_count*0.80)
-                            s_count -= c
-                            money += c*price
+                            pe_rank = '前20%至10%'
+                            c = floor((day_value * 0.20) / price)
+                            #print(c, day_value, "=========3")
+                            if c < s_count:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                            else:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                                
                         elif pe >= max_pe - pe_range * 0.30:
-                            c = floor(s_count*0.70)
-                            s_count -= c
-                            money += c*price
+                            pe_rank = '前30%至20%'
+                            c = floor((day_value * 0.30) / price)
+                            #print(c, day_value, day_value*0.70, floor(day_value*0.70), "=========4")
+                            if c < s_count:
+                                money += (s_count-c)*price
+                                s_count -= (s_count-c)
+                            else:
+                                money -= (c-s_count)*price
+                                s_count += (c-s_count)
+                                
                         # 当日收盘总资产
                         day_value = money+s_count*price
-                        print("%s, %s, 高, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
-                        draw_value_list.append(money+s_count*price)
+                        print("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        draw_value_list.append(day_value)
                         draw_date_list.append(h.date)
-                
                     # 更新下一次检查日
                     # 调整到下周二
                     d = d + timedelta(days=7)
+                    #print(c, "==========")
                     
             print("===投资结果===")
             print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
@@ -149,11 +207,12 @@ class Command(BaseCommand):
             print("")
             total_money += money
             total_stocks += s_count
+            total_stocks_value += price * s_count
             
         print("===总投资结果===")
         # 总价值
-        all_value = total_money+total_stocks*price
+        all_value = total_money+total_stocks_value
         # 总成本
         all_cost = cost*my_stocks.count()
-        print("总投入%f 总剩余资金%f 总剩余股票%f 总股票价值%f === 总价值%f" % (cost*my_stocks.count(), total_money, total_stocks, total_stocks*price, all_value) )
+        print("总投入%f 总剩余资金%f 总剩余股票%f 总股票价值%f === 总价值%f" % (all_cost, total_money, total_stocks, total_stocks_value, all_value) )
         print("总绝对收益%s 总复合年化收益率%s " % ("{:.2%}".format(all_value/all_cost - 1), "{:.2%}".format((pow(all_value/all_cost, 1/yrs)-1))) )
