@@ -3,4 +3,4 @@ pandas
 tushare
 django
 futu-api
-
+numpy

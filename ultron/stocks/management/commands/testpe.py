@@ -11,11 +11,30 @@ import baostock as bs
 import pandas as pd
 
 from math import floor
+import numpy as np
 
 class Command(BaseCommand):
     help = '回溯测试'
     
     def handle(self, *args, **options):
+        
+        def MaxDrawdown(return_list):
+            # 1. find all of the peak of cumlative return 
+            maxcum = np.zeros(len(return_list))
+            b = return_list[0]
+            for i in range(0,len((return_list))):
+                if (return_list[i]>b):
+                    b = return_list[i]
+                maxcum[i] = b
+    
+            # 2. then find the max drawndown point
+            i = np.argmax((np.maximum.accumulate(return_list)- return_list)/np.maximum.accumulate(return_list))
+            if i == 0:
+                return 0
+            j = np.argmax(return_list[:i])
+        
+            # 3. return the maxdrawndown
+            return(return_list[j] - return_list[i]) / return_list[j],j,i
         
         #### 四个关注指标 ####
         # close 当日收盘价
@@ -27,7 +46,7 @@ class Command(BaseCommand):
         today = date.today()
 
         my_stocks = Stock.objects.all()
-        print("股票, 低估/高估, 持有股票, 持有资金, 交易日, 交易价格")
+        print("股票, 低估/高估, 持有股票, 持有资金, 交易日, 当日价格, 资金+股票")
 
         for s in my_stocks:
             
@@ -43,6 +62,11 @@ class Command(BaseCommand):
             yrs = (today-d).days/365
             # 实际交易日
             dz = date.fromisoformat("2019-01-01")
+            
+            # 回撤的资产list
+            draw_value_list = []
+            # 回撤的日期list
+            draw_date_list = []
         
             h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s)
             
@@ -80,7 +104,9 @@ class Command(BaseCommand):
                             c = floor((money * 0.75) / price)
                             s_count += c
                             money -= c*price
-                        print("%s, 低估, %f, %f, %s, %s" % (h.stock.code_name, s_count, money, h.date, price))
+                        print("%s, 低估, %f, %f, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, money+s_count*price))
+                        draw_value_list.append(money+s_count*price)
+                        draw_date_list.append(h.date)
                     elif pe >= top_pe:
                         if pe >= max_pe - pe_range * 0.05:
                             c = floor(s_count*0.95)
@@ -98,7 +124,9 @@ class Command(BaseCommand):
                             c = floor(s_count*0.70)
                             s_count -= c
                             money += c*price
-                        print("%s, 高估, %f, %f, %s, %s" % (h.stock.code_name, s_count, money, h.date, price))
+                        print("%s, 高估, %f, %f, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, money+s_count*price))
+                        draw_value_list.append(money+s_count*price)
+                        draw_date_list.append(h.date)
                 
                     # 更新下一次检查日
                     # 调整到下周二
@@ -107,6 +135,10 @@ class Command(BaseCommand):
             print("===投资结果===")
             print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
             print("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
+            
+            drawndown,startdate,enddate = MaxDrawdown(draw_value_list)
+            print( "%s 最大回撤%s 开始日期%s 结束日期%s" % ( h.stock.code_name, "{:.2%}".format(drawndown), draw_date_list[startdate], draw_date_list[enddate]) )
+            
             print("")
             total_money += money
             total_stocks += s_count
