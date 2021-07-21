@@ -46,7 +46,7 @@ class Command(BaseCommand):
         today = date.today()
 
         my_stocks = Stock.objects.all()
-        print("股票, 低估/高估, 持有股票, 持有资金, 交易日, 当日价格, pe, max(pe), min(pe), 资金+股票")
+        print("股票, 日期, 低估/高估, P/E, Max P/E, Min P/E, 当日股价, 股持仓, 股价值, 现金, 股比例, 现金比例, 总价值")
 
         for s in my_stocks:
             
@@ -86,6 +86,9 @@ class Command(BaseCommand):
                     # 交易价格
                     price = float(h.open_price.normalize())
                     #print(top_pe, bottom_pe)
+                    
+                    # 当日开盘总资产
+                    day_value = money+s_count*price
             
                     if pe <= bottom_pe:
                         if pe <= min_pe + pe_range * 0.05:
@@ -104,7 +107,9 @@ class Command(BaseCommand):
                             c = floor((money * 0.75) / price)
                             s_count += c
                             money -= c*price
-                        print("%s, 低估, %f, %f, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, h.peTTM, h.maxPE, h.minPE, money+s_count*price))
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        print("%s, %s, 低, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                         draw_value_list.append(money+s_count*price)
                         draw_date_list.append(h.date)
                     elif pe >= top_pe:
@@ -124,7 +129,9 @@ class Command(BaseCommand):
                             c = floor(s_count*0.70)
                             s_count -= c
                             money += c*price
-                        print("%s, 高估, %f, %f, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, s_count, money, h.date, price, h.peTTM, h.maxPE, h.minPE, money+s_count*price))
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        print("%s, %s, 高, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                         draw_value_list.append(money+s_count*price)
                         draw_date_list.append(h.date)
                 
