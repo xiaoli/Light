@@ -192,6 +192,12 @@ class Command(BaseCommand):
                         print("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                         draw_value_list.append(day_value)
                         draw_date_list.append(h.date)
+                        
+                    else:
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        pe_rank = '无档位'
+                        print("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                     # 更新下一次检查日
                     # 调整到下周二
                     d = d + timedelta(days=7)
