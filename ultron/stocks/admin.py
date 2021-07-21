@@ -19,9 +19,12 @@ class StockAdmin(admin.ModelAdmin):
     get_ipo_date.short_description = '上市日期'
 
 class KHistoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_stock', 'get_date', 'open_price', 'high_price', 'low_price', 'close_price', 'preclose_price', 
-                    'volume', 'amount', 'adjust_flag', 'turn', 'trades_tatus', 'pctChg', 'peTTM', 'psTTM', 'pcfNcfTTM',
-                    'pbMRQ', 'is_st')
+    #list_display = ('id', 'get_stock', 'get_date', 'open_price', 'high_price', 'low_price', 'close_price', 'preclose_price', 
+    #                'volume', 'amount', 'adjust_flag', 'turn', 'trades_tatus', 'pctChg', 'peTTM', 'psTTM', 'pcfNcfTTM',
+    #                'pbMRQ', 'is_st')
+                    
+    list_display = ('id', 'get_stock', 'get_date', 'open_price', 'high_price', 'low_price', 'close_price',
+                    'volume', 'amount', 'peTTM', 'maxPE', 'minPE')
     def get_stock(self, obj):
         return obj.stock.code_name
     get_stock.short_description = '证券名称'
