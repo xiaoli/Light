@@ -101,7 +101,7 @@ class Command(BaseCommand):
             print("===投资结果===")
             print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
             total_money += money
-            total_stocks += s_count
+            total_stocks += s_count*price
             
         print("===总投资结果===")
         print("总投入%f 总市值%f 总现钞%f 总股票价值%f" % (100000*my_stocks.count(), total_money+total_stocks, total_money, total_stocks) )

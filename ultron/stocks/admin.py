@@ -33,7 +33,7 @@ class KHistoryAdmin(admin.ModelAdmin):
         return obj.date.strftime("%Y-%m-%d")
     get_date.admin_order_field = 'date'
     get_date.short_description = '交易所行情日期'
-                    
+
 
 admin.site.register(models.Stock, StockAdmin)
 admin.site.register(models.KHistory, KHistoryAdmin)
