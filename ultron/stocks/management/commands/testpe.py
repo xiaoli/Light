@@ -23,18 +23,24 @@ class Command(BaseCommand):
         
         total_stocks = 0
         total_money = 0
+        
+        today = date.today()
 
         my_stocks = Stock.objects.all()
         print("股票, 低估/高估, 持有股票, 持有资金, 交易日, 交易价格")
 
         for s in my_stocks:
             
-            # 总资本
+            # 固定成本
+            cost = 100000
+            # 总起始资本
             money = 100000
             # 持有股票数量
             s_count = 0
             # 开启交易日 2019.01.01 是周二，每周二交易
             d = date.fromisoformat("2019-01-01")
+            # 总年份数
+            yrs = (today-d).days/365
             # 实际交易日
             dz = date.fromisoformat("2019-01-01")
         
@@ -100,8 +106,15 @@ class Command(BaseCommand):
                     
             print("===投资结果===")
             print("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
+            print("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
+            print("")
             total_money += money
-            total_stocks += s_count*price
+            total_stocks += s_count
             
         print("===总投资结果===")
-        print("总投入%f 总市值%f 总现钞%f 总股票价值%f" % (100000*my_stocks.count(), total_money+total_stocks, total_money, total_stocks) )
+        # 总价值
+        all_value = total_money+total_stocks*price
+        # 总成本
+        all_cost = cost*my_stocks.count()
+        print("总投入%f 总剩余资金%f 总剩余股票%f 总股票价值%f === 总价值%f" % (cost*my_stocks.count(), total_money, total_stocks, total_stocks*price, all_value) )
+        print("总绝对收益%s 总复合年化收益率%s " % ("{:.2%}".format(all_value/all_cost - 1), "{:.2%}".format((pow(all_value/all_cost, 1/yrs)-1))) )
