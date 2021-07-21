@@ -4,3 +4,19 @@ update stocks_khistory set pctChg = 0 where pctChg = '';
 update stocks_khistory set peTTM = 0 where peTTM = '';
 update stocks_khistory set psTTM = 0 where psTTM = '';
 update stocks_khistory set pcfNcfTTM = 0 where pcfNcfTTM = '';
+
+#######
+# 步骤 #
+#######
+#1 根据股票代码导入股票指数基本信息（同时验证 baostock 是否支持该股票指数）
+python manage.py importstocks --settings=ultron.settings.dev
+#2 在理杏仁网站，手动下载#1中已导入的股票指数 pe 数据
+#略
+#3 手动更名为相应的股票指数代码.csv
+#略
+#4 导入 pe 数据
+python manage.py importpe --settings=ultron.settings.dev
+#5 计算近十年的滚动 PE 平均值
+python manage.py avgpe --settings=ultron.settings.dev
+#6 计算 PE 策略下的投资收益
+python manage.py testpe --settings=ultron.settings.dev
