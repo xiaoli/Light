@@ -1,0 +1,64 @@
+{% extends "new_base.html" %}
+
+{% block content %}
+<div class="row content">
+    <div class="row mb-3">
+        <div class="col-sm-12">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                    <th scope="col">规则名称</th>
+                    <th scope="col">操作</th>
+                    <th scope="col">高低估区间判断值</th>
+                    <th scope="col">股票持仓比例</th>
+                    <th scope="col">是否生效</th>
+                    <th scope="col">优先级</th>
+                    <th scope="col">创建时间</th>
+                    <th scope="col">更新时间</th>
+                </tr>
+              </thead>
+              <tbody>
+          		{% for s in s_list %}
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            策略名称: {{ s.name }}，高估区间 {{ s.top_limit }}%，低估区间 {{ s.bottom_limit }}%
+                        </td>
+                    </tr>
+                      {% for r in s.get_high_rules_by_priority %}
+                          <tr>
+                              <td>{{ r.name }}</td>
+                              <td>{{ r.get_operation_display }}</td>
+                              <td>{{ r.limit }}%</td>
+                              <td>{{ r.holding }}%</td>
+                              <td>{{ r.get_available_display }}</td>
+                              <td>{{ r.priority }}</td>
+                              <td>{{ r.created_date }}</td>
+                              <td>{{ r.updated_date }}</td>
+                          </tr>
+                      {% endfor %}
+                
+                      {% for r in s.get_low_rules_by_priority %}
+                          <tr>
+                              <td>{{ r.name }}</td>
+                              <td>{{ r.get_operation_display }}</td>
+                              <td>{{ r.limit }}%</td>
+                              <td>{{ r.holding }}%</td>
+                              <td>{{ r.get_available_display }}</td>
+                              <td>{{ r.priority }}</td>
+                              <td>{{ r.created_date }}</td>
+                              <td>{{ r.updated_date }}</td>
+                          </tr>
+                      {% endfor %}
+                      
+                      <tr>
+                          <td colspan="8" class="text-center">
+                              <a class="btn btn-info btn-sm" href="{% url "calculate" %}?sid={{s.id}}">回测</a>
+                          </td>
+                      </tr>
+          		{% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

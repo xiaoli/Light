@@ -1,0 +1,21 @@
+{% extends "new_base.html" %}
+
+{% block content %}
+<div class="row content">
+    <div class="row mb-3">
+        <div class="col-sm-12">
+            <table class="table table-hover table-striped">
+              <tbody>
+          		{% for s in str_list %}
+                      <tr>
+                          <td>
+                              {{ s }}
+                          </td>
+                      </tr>
+          		{% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

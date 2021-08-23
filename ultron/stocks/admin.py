@@ -38,7 +38,7 @@ class StrategyAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'get_available_display', 'top_limit', 'bottom_limit', 'status', 'created_date', 'updated_date', 'calculated_date')
 
 class RuleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'get_operation_display', 'limit', 'holding', 'get_available_display', 'priority', 'created_date', 'updated_date')
+    list_display = ('id', 'strategy', 'name', 'get_operation_display', 'limit', 'holding', 'get_available_display', 'priority', 'created_date', 'updated_date')
 
 admin.site.register(models.Stock, StockAdmin)
 admin.site.register(models.KHistory, KHistoryAdmin)

@@ -39,7 +39,9 @@ class Command(BaseCommand):
         
         my_strategies = Strategy.objects.filter(available=1)
         for strategy in my_strategies:
-            print("========= 策略：s% =========", strategy.name)
+            print("===========================")
+            print("          策略：%s          " % strategy.name)
+            print("===========================")
             
             high_rules = Rule.objects.filter(strategy=strategy, operation=2, available=1).order_by('-priority')
             low_rules = Rule.objects.filter(strategy=strategy, operation=1, available=1).order_by('-priority')

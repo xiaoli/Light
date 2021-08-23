@@ -119,6 +119,14 @@ class Strategy(models.Model):
     
     def __str__(self):
             return '%s' % (self.name)
+            
+    def get_high_rules_by_priority(self):   
+            if self.rule_set.count():
+                return self.rule_set.filter(operation=2, available=1).order_by('-priority')
+                
+    def get_low_rules_by_priority(self):   
+            if self.rule_set.count():
+                return self.rule_set.filter(operation=1, available=1).order_by('-priority')
     
     class Meta:
         verbose_name = "策略"
