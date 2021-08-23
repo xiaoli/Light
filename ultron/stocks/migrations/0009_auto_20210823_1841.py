@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='rule',
             name='strategy',
-            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.CASCADE, to='stocks.strategy', verbose_name='策略名称'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='stocks.strategy', verbose_name='策略名称'),
             preserve_default=False,
         ),
         migrations.AlterField(
