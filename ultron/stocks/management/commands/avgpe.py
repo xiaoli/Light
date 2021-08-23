@@ -35,5 +35,6 @@ class Command(BaseCommand):
                 
                 h.maxPE = pe.get('peTTM__max')
                 h.minPE = pe.get('peTTM__min')
+                h.avgPE = pe.get('peTTM__avg')
                 h.save()
                 

@@ -33,7 +33,14 @@ class KHistoryAdmin(admin.ModelAdmin):
         return obj.date.strftime("%Y-%m-%d")
     get_date.admin_order_field = 'date'
     get_date.short_description = '交易所行情日期'
+    
+class StrategyAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'get_available_display', 'top_limit', 'bottom_limit', 'status', 'created_date', 'updated_date', 'calculated_date')
 
+class RuleAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'get_operation_display', 'limit', 'holding', 'get_available_display', 'priority', 'created_date', 'updated_date')
 
 admin.site.register(models.Stock, StockAdmin)
 admin.site.register(models.KHistory, KHistoryAdmin)
+admin.site.register(models.Strategy, StrategyAdmin)
+admin.site.register(models.Rule, RuleAdmin)
