@@ -3,6 +3,7 @@ from django.contrib import admin
 from . import models
 
 class StockAdmin(admin.ModelAdmin):
+    search_fields = ['code', 'code_name']
     list_display = ('id', 'code', 'code_name', 'get_ipo_date', 'out_date', 'get_ipo_type', 'get_ipo_status')
     
     def get_ipo_type(self, obj):
@@ -35,7 +36,8 @@ class KHistoryAdmin(admin.ModelAdmin):
     get_date.short_description = '交易所行情日期'
     
 class StrategyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'get_available_display', 'top_limit', 'bottom_limit', 'status', 'created_date', 'updated_date', 'calculated_date')
+    autocomplete_fields = ['stocks']
+    list_display = ('id', 'name', 'get_s_type_display', 'get_available_display', 'top_limit', 'bottom_limit', 'status', 'created_date', 'updated_date', 'calculated_date')
 
 class RuleAdmin(admin.ModelAdmin):
     list_display = ('id', 'strategy', 'name', 'get_operation_display', 'limit', 'holding', 'get_available_display', 'priority', 'created_date', 'updated_date')

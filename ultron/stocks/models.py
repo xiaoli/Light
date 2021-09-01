@@ -100,11 +100,22 @@ class Strategy(models.Model):
         (0, '无效')
     )
     
+    TYPE_CHOICES = (
+        (1, 'MM策略'),
+        (2, '均值策略')
+    )
+    
     name = models.CharField(max_length=255, blank=True, null=True, verbose_name="策略名称")
     available = models.SmallIntegerField(
         choices=AVAILABLE_CHOICES,
         default=1,
         verbose_name="是否生效"
+    )
+    stocks = models.ManyToManyField(Stock, related_name='strategy_stocks', verbose_name='选择策略应用于的股票/指数（可以多选）')
+    s_type = models.SmallIntegerField(
+        choices=TYPE_CHOICES,
+        default=1,
+        verbose_name="策略类型"
     )
     top_limit = models.SmallIntegerField(default=1, verbose_name="高估区间，PE Range 上限值，单位%")
     bottom_limit = models.SmallIntegerField(default=1, verbose_name="低估区间，PE Range 下限值，单位%")
