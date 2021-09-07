@@ -117,8 +117,8 @@ class Strategy(models.Model):
         default=1,
         verbose_name="策略类型"
     )
-    top_limit = models.SmallIntegerField(default=1, verbose_name="高估区间，PE Range 上限值，单位%")
-    bottom_limit = models.SmallIntegerField(default=1, verbose_name="低估区间，PE Range 下限值，单位%")
+    top_limit = models.SmallIntegerField(default=1, verbose_name="考察范围：高估上限值，单位%")
+    bottom_limit = models.SmallIntegerField(default=1, verbose_name="考察范围：低估下限值，单位%")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     updated_date = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     calculated_date = models.DateTimeField(blank=True, null=True, verbose_name="运算时间")
@@ -168,7 +168,7 @@ class Rule(models.Model):
         default=1,
         verbose_name="高估 or 低估"
     )
-    limit = models.SmallIntegerField(default=1, verbose_name="高低估区间，PE Range 上限值，单位%")
+    limit = models.SmallIntegerField(default=1, verbose_name="高低估区间的档位，PE限值，单位%")
     holding = models.SmallIntegerField(default=1, verbose_name="股票持仓比例，单位%")
     available = models.SmallIntegerField(
         choices=AVAILABLE_CHOICES,
