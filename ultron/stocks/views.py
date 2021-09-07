@@ -146,7 +146,12 @@ def calculate(request):
     today = date.today()
 
     #my_stocks = Stock.objects.filter(code='sh.000300')
-    my_stocks = Stock.objects.all()
+    # 所有股票
+    #my_stocks = Stock.objects.all()
+    
+    # 仅限选中股票
+    my_stocks = strategy.stocks.all()
+    
     str_list.append("股票, 日期, 低估/高估, 具体分档, P/E, Max P/E, Min P/E, 当日股价, 股持仓, 股价值, 现金, 股比例, 现金比例, 总价值")
 
     for s in my_stocks:
@@ -169,6 +174,7 @@ def calculate(request):
         # 回撤的日期list
         draw_date_list = []
 
+        
         h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s)
     
         for h in h_list:
@@ -176,8 +182,15 @@ def calculate(request):
             # 每周二之后交易
             if (h.date - d).days >= 7:
             
+                # 均值策略(默认)
                 max_pe = float(h.maxPE)
                 min_pe = float(h.minPE)
+                
+                # MM策略
+                if strategy.s_type is 1:
+                    max_pe = float(h.avgMaxPE)
+                    min_pe = float(h.avgMinPE)
+                    
                 pe = float(h.peTTM)
                 pe_range = max_pe - min_pe
     
