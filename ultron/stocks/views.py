@@ -187,7 +187,7 @@ def calculate(request):
                 min_pe = float(h.minPE)
                 
                 # MM策略
-                if strategy.s_type is 1:
+                if strategy.s_type == 2:
                     max_pe = float(h.avgMaxPE)
                     min_pe = float(h.avgMinPE)
                     
@@ -224,7 +224,7 @@ def calculate(request):
                         
                     # 当日收盘总资产
                     day_value = money+s_count*price
-                    str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                    str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                     draw_value_list.append(money+s_count*price)
                     draw_date_list.append(h.date)
                 
@@ -245,7 +245,7 @@ def calculate(request):
                         
                     # 当日收盘总资产
                     day_value = money+s_count*price
-                    str_list.append("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                    str_list.append("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                     draw_value_list.append(day_value)
                     draw_date_list.append(h.date)
                 
@@ -253,7 +253,7 @@ def calculate(request):
                     # 当日收盘总资产
                     day_value = money+s_count*price
                     pe_rank = '无档位'
-                    str_list.append("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, h.maxPE, h.minPE, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                    str_list.append("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                 # 更新下一次检查日
                 # 调整到下周二
                 d = d + timedelta(days=7)
