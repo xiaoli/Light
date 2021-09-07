@@ -211,6 +211,7 @@ def calculate(request):
                     
                     for r in low_rules:
                         if pe <= min_pe + pe_range * (r.limit/100):
+                            pe_rank = r.name
                             c = floor((day_value * (r.holding/100)) / price)
                             if c > s_count:
                                 money -= (c-s_count)*price
@@ -231,6 +232,7 @@ def calculate(request):
                     
                     for r in high_rules:
                         if pe >= max_pe - pe_range * (r.limit/100):
+                            pe_rank = r.name
                             c = floor((day_value * (r.holding/100)) / price)
                             if c < s_count:
                                 money += (s_count-c)*price
