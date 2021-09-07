@@ -74,6 +74,8 @@ class KHistory(models.Model):
     maxPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年最高市盈率")
     minPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年最低市盈率")
     avgPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年平均市盈率")
+    avgMaxPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年前30%最高平均市盈率")
+    avgMinPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年后30%最低平均市盈率")
     psTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市销率")
     pcfNcfTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市现率")
     pbMRQ = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="市净率")
