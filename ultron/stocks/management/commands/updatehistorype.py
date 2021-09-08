@@ -78,5 +78,5 @@ class Command(BaseCommand):
                         k = KHistory.objects.get(stock=stock, date=p.get("date")[:10])
                         k.peTTM = p.get("pe_ttm").get("mcw")
                         k.save()
-                    except Exception as e:
+                    except (Stock.DoesNotExist, Exception) as e:
                         print("%s %s cannot be saved. %s" % (x[1], x[0], sys.exc_info()[1]))
