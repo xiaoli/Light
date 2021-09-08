@@ -4,13 +4,27 @@
 <div class="row content">
     <div class="row mb-3">
         <div class="col-sm-12">
+            {% for s in s_list %}
             <table class="table table-hover table-striped">
               <thead>
+                  <tr>
+                      <td colspan="8" class="text-center">
+                          策略名称: {{ s.name }}-{{ s.get_s_type_display }}，高估区间 {{ s.top_limit }}%，低估区间 {{ s.bottom_limit }}%
+                      </td>
+                  </tr>
+                  <tr>
+                      <td colspan="8" class="text-center">
+                          应用于股票/指数: 
+                          {% for stock in s.stocks.all %}
+                          [{{ stock.code }}]{{ stock.code_name }} 
+                          {% endfor %}
+                      </td>
+                  </tr>
                 <tr>
                     <th scope="col">规则名称</th>
                     <th scope="col">操作</th>
-                    <th scope="col">高低估区间判断值</th>
-                    <th scope="col">股票持仓比例</th>
+                    <th scope="col">区间档位</th>
+                    <th scope="col">持仓比例</th>
                     <th scope="col">是否生效</th>
                     <th scope="col">优先级</th>
                     <th scope="col">创建时间</th>
@@ -18,12 +32,6 @@
                 </tr>
               </thead>
               <tbody>
-          		{% for s in s_list %}
-                    <tr>
-                        <td colspan="8" class="text-center">
-                            策略名称: {{ s.name }}，高估区间 {{ s.top_limit }}%，低估区间 {{ s.bottom_limit }}%
-                        </td>
-                    </tr>
                       {% for r in s.get_high_rules_by_priority %}
                           <tr>
                               <td>{{ r.name }}</td>
@@ -55,9 +63,9 @@
                               <a class="btn btn-info btn-sm" href="{% url "calculate" %}?sid={{s.id}}">回测</a>
                           </td>
                       </tr>
-          		{% endfor %}
               </tbody>
             </table>
+            {% endfor %}
         </div>
     </div>
 </div>
