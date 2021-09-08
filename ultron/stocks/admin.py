@@ -15,7 +15,10 @@ class StockAdmin(admin.ModelAdmin):
     get_ipo_status.short_description = '上市状态'
     
     def get_ipo_date(self, obj):
-        return obj.ipo_date.strftime("%Y-%m-%d")
+        d = ""
+        if obj.ipo_date:
+            d = obj.ipo_date.strftime("%Y-%m-%d")
+        return d
     get_ipo_date.admin_order_field = 'ipo_date'
     get_ipo_date.short_description = '上市日期'
 

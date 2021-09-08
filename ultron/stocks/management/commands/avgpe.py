@@ -18,8 +18,6 @@ class Command(BaseCommand):
         #### 四个关注指标 ####
         # close 当日收盘价
         # peTTM 滚动市盈率
-        
-        money = 100000
 
         my_stocks = Stock.objects.all()
 

@@ -35,4 +35,4 @@ python manage.py updatehistorype --settings=ultron.settings.prod
 
 
 # crontab
-*/10 * * * * /srv/www/17fenlei/cronjob.sh
+*/10 * * * * /srv/www/Ultron/cron.sh
