@@ -47,43 +47,44 @@ class Command(BaseCommand):
             if start_date_from_db is not None:
                 start_date = start_date_from_db.strftime('%Y-%m-%d')
             
-            print(stock.code, stock.code_name, start_date)
+            print(stock.code, stock.code_name, start_date, end_date)
             
-            rs = bs.query_history_k_data_plus(stock.code,
-                "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,psTTM,pcfNcfTTM,pbMRQ,isST",
-                start_date=start_date, end_date=end_date,
-                frequency="d", adjustflag="3")
-            print('query_history_k_data_plus respond error_code:'+rs.error_code)
-            print('query_history_k_data_plus respond  error_msg:'+rs.error_msg)
+            if start_date != end_date:
+                rs = bs.query_history_k_data_plus(stock.code,
+                    "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,psTTM,pcfNcfTTM,pbMRQ,isST",
+                    start_date=start_date, end_date=end_date,
+                    frequency="d", adjustflag="3")
+                print('query_history_k_data_plus respond error_code:'+rs.error_code)
+                print('query_history_k_data_plus respond  error_msg:'+rs.error_msg)
 
-            #### 打印结果集 ####
-            while (rs.error_code == '0') & rs.next():
-                # 获取一条记录，将记录合并在一起
-                x = rs.get_row_data()
-                print(x)
-                try:
-                    k = KHistory()
-                    k.stock = stock
-                    k.date = None if not x[0] else date(*map(int, x[0].split('-')))
-                    k.open_price = float(x[2])
-                    k.high_price = float(x[3])
-                    k.low_price = float(x[4])
-                    k.close_price = float(x[5])
-                    k.preclose_price = float(x[6])
-                    k.volume = float(x[7])
-                    k.amount = float(x[8])
-                    k.adjust_flag = int(x[9])
-                    k.turn = float(x[10])
-                    k.trades_tatus = int(x[11])
-                    k.pctChg = float(x[12])
-                    k.peTTM = float(x[13] if x[13] else 0)
-                    k.psTTM = float(x[14] if x[14] else 0)
-                    k.pcfNcfTTM = float(x[15] if x[15] else 0)
-                    k.pbMRQ = float(x[16] if x[16] else 0)
-                    k.is_st = int(x[17] if x[17] else 0)
-                    k.save()
-                except Exception as e:
-                    print("%s %s cannot be saved. %s" % (x[1], x[0], sys.exc_info()[1]))
+                #### 打印结果集 ####
+                while (rs.error_code == '0') & rs.next():
+                    # 获取一条记录，将记录合并在一起
+                    x = rs.get_row_data()
+                    print(x)
+                    try:
+                        k = KHistory()
+                        k.stock = stock
+                        k.date = None if not x[0] else date(*map(int, x[0].split('-')))
+                        k.open_price = float(x[2])
+                        k.high_price = float(x[3])
+                        k.low_price = float(x[4])
+                        k.close_price = float(x[5])
+                        k.preclose_price = float(x[6])
+                        k.volume = float(x[7])
+                        k.amount = float(x[8])
+                        k.adjust_flag = int(x[9])
+                        k.turn = float(x[10])
+                        k.trades_tatus = int(x[11])
+                        k.pctChg = float(x[12])
+                        k.peTTM = float(x[13] if x[13] else 0)
+                        k.psTTM = float(x[14] if x[14] else 0)
+                        k.pcfNcfTTM = float(x[15] if x[15] else 0)
+                        k.pbMRQ = float(x[16] if x[16] else 0)
+                        k.is_st = int(x[17] if x[17] else 0)
+                        k.save()
+                    except Exception as e:
+                        print("%s %s cannot be saved. %s" % (x[1], x[0], sys.exc_info()[1]))
             
             
         #### 登出系统 ####
