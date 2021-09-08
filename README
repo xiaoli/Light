@@ -20,3 +20,19 @@ python manage.py importpe --settings=ultron.settings.dev
 python manage.py avgpe --settings=ultron.settings.dev
 #6 计算 PE 策略下的投资收益
 python manage.py testpe --settings=ultron.settings.dev
+
+
+
+2021.09.08 自动更新数据
+#1 先更新股指信息
+python manage.py updatestocks --settings=ultron.settings.prod
+#2 再更新日K线历史
+python manage.py updatehistory --settings=ultron.settings.prod
+#3 补充指数的PE数据
+python manage.py updatehistorype --settings=ultron.settings.prod
+
+
+
+
+# crontab
+*/10 * * * * /srv/www/17fenlei/cronjob.sh

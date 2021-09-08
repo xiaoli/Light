@@ -24,7 +24,9 @@ class Command(BaseCommand):
         my_stocks = Stock.objects.all()
 
         for s in my_stocks:
-            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s)
+            # avgPE__isnull=True 仅计算未计算过的数据
+            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, avgPE__isnull=True)
+            
             print(h_list.count())
             for h in h_list:
                 print(h.date)
