@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
         for s in my_stocks:
             # metrics_value__isnull=True 仅计算未计算过的数据
-            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s)
+            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, metrics_value__isnull=True)
             
             print(h_list.count())
             for h in h_list:
