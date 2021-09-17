@@ -4,3 +4,4 @@ tushare
 django
 futu-api
 numpy
+simplejson
