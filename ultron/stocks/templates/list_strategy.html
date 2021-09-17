@@ -59,10 +59,29 @@
                       {% endfor %}
                       
                       <tr>
-                          <td colspan="8" class="text-center">
-                              
-                              <a class="btn btn-info btn-sm" href="{% url "calculate" %}?sid={{s.id}}">回测</a>
+                          <form action="{% url "calculate" %}" method="GET">
+                              <input name="sid" value="{{ s.id }}">
+                          <td colspan="3"></td>
+                          <td>
+                              <select class="form-select" name="year">
+                                <option selected>选择PE计算年份</option>
+                                <option value="1">1年</option>
+                                <option value="2">2年</option>
+                                <option value="3">3年</option>
+                                <option value="4">4年</option>
+                                <option value="5">5年</option>
+                                <option value="6">6年</option>
+                                <option value="7">7年</option>
+                                <option value="8">8年</option>
+                                <option value="9">9年</option>
+                                <option value="10">10年</option>
+                              </select>
                           </td>
+                          <td class="text-center">
+                              <input class="btn btn-info btn-sm" type="submit" value="回测">
+                          </td>
+                          <td colspan="3"></td>
+                          </form>
                       </tr>
               </tbody>
             </table>
