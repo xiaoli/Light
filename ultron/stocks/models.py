@@ -28,7 +28,7 @@ class Stock(models.Model):
     )
     
     def __str__(self):
-            return '%s' % (self.code_name)
+        return '%s' % (self.code_name)
     
     class Meta:
         verbose_name = "证券"
@@ -71,11 +71,6 @@ class KHistory(models.Model):
     )
     pctChg = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="涨跌幅（百分比）")
     peTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市盈率")
-    maxPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年最高市盈率")
-    minPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年最低市盈率")
-    avgPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年平均市盈率")
-    avgMaxPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年前30%最高平均市盈率")
-    avgMinPE = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="近十年后30%最低平均市盈率")
     psTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市销率")
     pcfNcfTTM = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="滚动市现率")
     pbMRQ = models.DecimalField(max_digits=19, decimal_places=10, null=True, verbose_name="市净率")
@@ -84,6 +79,7 @@ class KHistory(models.Model):
         default=0,
         verbose_name="是否ST"
     )
+    metrics_value = models.TextField(blank=True, null=True, verbose_name="PE自动计算值")
     
     class Meta:
         verbose_name = "K线数据"
@@ -104,7 +100,8 @@ class Strategy(models.Model):
     
     TYPE_CHOICES = (
         (1, 'MM策略'),
-        (2, '均值策略')
+        (2, '均值策略'),
+        (3, '均值策略V1')
     )
     
     name = models.CharField(max_length=255, blank=True, null=True, verbose_name="策略名称")
@@ -131,15 +128,15 @@ class Strategy(models.Model):
     )
     
     def __str__(self):
-            return '%s' % (self.name)
+        return '%s' % (self.name)
             
     def get_high_rules_by_priority(self):   
-            if self.rule_set.count():
-                return self.rule_set.filter(operation=2, available=1).order_by('-priority')
+        if self.rule_set.count():
+            return self.rule_set.filter(operation=2, available=1).order_by('-priority')
                 
     def get_low_rules_by_priority(self):   
-            if self.rule_set.count():
-                return self.rule_set.filter(operation=1, available=1).order_by('-priority')
+        if self.rule_set.count():
+            return self.rule_set.filter(operation=1, available=1).order_by('-priority')
     
     class Meta:
         verbose_name = "策略"
@@ -182,7 +179,7 @@ class Rule(models.Model):
     updated_date = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     
     def __str__(self):
-            return '%s' % (self.name)
+        return '%s' % (self.name)
     
     class Meta:
         verbose_name = "规则"

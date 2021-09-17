@@ -123,7 +123,10 @@ def MaxDrawdown(return_list):
 
 @login_required(login_url='/admin/login/')
 def calculate(request):
+    # 策略ID
     sid = request.GET.get('sid', 1)
+    # 考察年份
+    year = request.GET.get('year', 10)
     strategy = get_object_or_404(Strategy, pk=sid)
     
     str_list = []
@@ -178,24 +181,30 @@ def calculate(request):
         h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s)
     
         for h in h_list:
+            metrics_value = json.loads(h.metrics_value)
         
             # 每周二之后交易
             if (h.date - d).days >= 7:
             
                 # 均值策略(默认)
-                max_pe = float(h.maxPE)
-                min_pe = float(h.minPE)
+                max_pe = float(metrics_value.get("Y%s" % year).get("maxPE"))
+                min_pe = float(metrics_value.get("Y%s" % year).get("minPE"))
                 
                 # MM策略
                 if strategy.s_type == 2:
-                    max_pe = float(h.avgMaxPE)
-                    min_pe = float(h.avgMinPE)
+                    max_pe = float(metrics_value.get("Y%s" % year).get("avgMaxPE"))
+                    min_pe = float(metrics_value.get("Y%s" % year).get("avgMinPE"))
                     
                 pe = float(h.peTTM)
                 pe_range = max_pe - min_pe
     
                 top_pe = max_pe - pe_range * (strategy.top_limit/100)
                 bottom_pe = min_pe + pe_range * (strategy.bottom_limit/100)
+                
+                # 均值策略V1
+                if strategy.s_type == 3:
+                    top_pe = float(metrics_value.get("Y%s" % year).get("avgH15PE"))
+                    bottom_pe = float(metrics_value.get("Y%s" % year).get("avgL30PE"))
     
                 # 交易价格
                 price = float(h.open_price.normalize())
@@ -207,53 +216,102 @@ def calculate(request):
                 # PE 档位
                 pe_rank = ''
     
-                if pe <= bottom_pe:
-                    
-                    for r in low_rules:
-                        if pe <= min_pe + pe_range * (r.limit/100):
-                            pe_rank = r.name
-                            c = floor((day_value * (r.holding/100)) / price)
-                            if c > s_count:
-                                money -= (c-s_count)*price
-                                s_count += (c-s_count)
-                            else:
-                                money += (s_count-c)*price
-                                s_count -= (s_count-c)
-                                
-                            break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
+                # 均值策略 或 MM策略
+                if strategy.s_type != 3:
+                    if pe <= bottom_pe:
+                        for r in low_rules:
+                            if pe <= min_pe + pe_range * (r.limit/100):
+                                pe_rank = r.name
+                                c = floor((day_value * (r.holding/100)) / price)
+                                if c > s_count:
+                                    money -= (c-s_count)*price
+                                    s_count += (c-s_count)
+                                else:
+                                    money += (s_count-c)*price
+                                    s_count -= (s_count-c)
+                            
+                                break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
                         
-                    # 当日收盘总资产
-                    day_value = money+s_count*price
-                    str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
-                    draw_value_list.append(money+s_count*price)
-                    draw_date_list.append(h.date)
-                
-                elif pe >= top_pe:
-                    
-                    for r in high_rules:
-                        if pe >= max_pe - pe_range * (r.limit/100):
-                            pe_rank = r.name
-                            c = floor((day_value * (r.holding/100)) / price)
-                            if c < s_count:
-                                money += (s_count-c)*price
-                                s_count -= (s_count-c)
-                            else:
-                                money -= (c-s_count)*price
-                                s_count += (c-s_count)
-                                
-                            break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        draw_value_list.append(money+s_count*price)
+                        draw_date_list.append(h.date)
                         
-                    # 当日收盘总资产
-                    day_value = money+s_count*price
-                    str_list.append("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
-                    draw_value_list.append(day_value)
-                    draw_date_list.append(h.date)
+                    elif pe >= top_pe:
+                        for r in high_rules:
+                            if pe >= max_pe - pe_range * (r.limit/100):
+                                pe_rank = r.name
+                                c = floor((day_value * (r.holding/100)) / price)
+                                if c < s_count:
+                                    money += (s_count-c)*price
+                                    s_count -= (s_count-c)
+                                else:
+                                    money -= (c-s_count)*price
+                                    s_count += (c-s_count)
+                            
+                                break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
+                            
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        str_list.append(str(r.id) + r.name + "%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        draw_value_list.append(day_value)
+                        draw_date_list.append(h.date)
                 
+                    else:
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        pe_rank = '无档位'
+                        str_list.append("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                
+                # 均值策略V1
                 else:
-                    # 当日收盘总资产
-                    day_value = money+s_count*price
-                    pe_rank = '无档位'
-                    str_list.append("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                    if pe <= bottom_pe:
+                        for r in low_rules:
+                            if pe <= float(metrics_value.get("Y%s" % year).get("avgL%sPE" % r.limit)):
+                                pe_rank = r.name
+                                c = floor((day_value * (r.holding/100)) / price)
+                                if c > s_count:
+                                    money -= (c-s_count)*price
+                                    s_count += (c-s_count)
+                                else:
+                                    money += (s_count-c)*price
+                                    s_count -= (s_count-c)
+                            
+                                break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
+                        
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        draw_value_list.append(money+s_count*price)
+                        draw_date_list.append(h.date)
+                        
+                    elif pe >= top_pe:
+                        for r in high_rules:
+                            if pe >= float(metrics_value.get("Y%s" % year).get("avgH%sPE" % r.limit)):
+                                pe_rank = r.name
+                                c = floor((day_value * (r.holding/100)) / price)
+                                if c < s_count:
+                                    money += (s_count-c)*price
+                                    s_count -= (s_count-c)
+                                else:
+                                    money -= (c-s_count)*price
+                                    s_count += (c-s_count)
+                            
+                                break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
+                            
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        str_list.append(str(r.id) + r.name + "%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        draw_value_list.append(day_value)
+                        draw_date_list.append(h.date)
+                
+                    else:
+                        # 当日收盘总资产
+                        day_value = money+s_count*price
+                        pe_rank = '无档位'
+                        str_list.append("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                
                 # 更新下一次检查日
                 # 调整到下周二
                 d = d + timedelta(days=7)

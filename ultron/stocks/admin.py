@@ -28,7 +28,7 @@ class KHistoryAdmin(admin.ModelAdmin):
     #                'pbMRQ', 'is_st')
                     
     list_display = ('id', 'get_stock', 'get_date', 'open_price', 'high_price', 'low_price', 'close_price',
-                    'volume', 'amount', 'peTTM', 'maxPE', 'minPE')
+                    'volume', 'amount', 'peTTM')
     def get_stock(self, obj):
         return obj.stock.code_name
     get_stock.short_description = '证券名称'
