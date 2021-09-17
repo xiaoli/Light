@@ -80,3 +80,5 @@ class Command(BaseCommand):
                         k.save()
                     except (Stock.DoesNotExist, Exception) as e:
                         print("%s %s cannot be saved. %s" % (x[1], x[0], sys.exc_info()[1]))
+                    except Exception as e:
+                        pass

@@ -27,7 +27,7 @@ class Command(BaseCommand):
             
             print(h_list.count())
             for h in h_list:
-                print(h.date)
+                print(h.date, h.id)
                 end_date = h.date#date.fromisoformat(h.date)
                 
                 # 保存至数据库的所有数据
@@ -54,20 +54,13 @@ class Command(BaseCommand):
                     current_year["avgMinPE"] = l_pe.get('peTTM__sum') / percent_count
                 
                     # 均值策略v1版所需
-                    h5_pe = all_pe_set.order_by('-peTTM')[:int(all_pe_set.count() * 0.05)].aggregate(Sum('peTTM'))
-                    h10_pe = all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * 0.05):int(all_pe_set.count() * 0.10)].aggregate(Sum('peTTM'))
-                    h15_pe = all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * 0.10):int(all_pe_set.count() * 0.15)].aggregate(Sum('peTTM'))
-                    l10_pe = all_pe_set.order_by('peTTM')[:int(all_pe_set.count() * 0.10)].aggregate(Sum('peTTM'))
-                    l20_pe = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * 0.10):int(all_pe_set.count() * 0.20)].aggregate(Sum('peTTM'))
-                    l30_pe = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * 0.20):int(all_pe_set.count() * 0.30)].aggregate(Sum('peTTM'))
-                    percent_count = int(all_pe_set.count() * 0.05)
-                    current_year["avgH5PE"] = h5_pe.get('peTTM__sum') / percent_count
-                    current_year["avgH10PE"] = h10_pe.get('peTTM__sum') / percent_count
-                    current_year["avgH15PE"] = h15_pe.get('peTTM__sum') / percent_count
-                    percent_count = int(all_pe_set.count() * 0.10)
-                    current_year["avgL10PE"] = l10_pe.get('peTTM__sum') / percent_count
-                    current_year["avgL20PE"] = l20_pe.get('peTTM__sum') / percent_count
-                    current_year["avgL30PE"] = l30_pe.get('peTTM__sum') / percent_count
+                    current_year["h_pe_list"] = []
+                    current_year["l_pe_list"] = []
+                    for x in range(0, 30):
+                        h_pe = all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)].aggregate(Sum('peTTM'))
+                        current_year["h_pe_list"].append( h_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01) )
+                        l_pe = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)].aggregate(Sum('peTTM'))
+                        current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01) )
                     
                     json_value_list["Y%s" % i] = current_year
                 
