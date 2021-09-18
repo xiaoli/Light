@@ -203,8 +203,20 @@ def calculate(request):
                 
                 # 均值策略V1
                 if strategy.s_type == 3:
-                    top_pe = float(metrics_value.get("Y%s" % year).get("avgH15PE"))
-                    bottom_pe = float(metrics_value.get("Y%s" % year).get("avgL30PE"))
+                    t = metrics_value.get("Y%s" % year).get("h_pe_list")[:strategy.top_limit]
+                    b = metrics_value.get("Y%s" % year).get("l_pe_list")[:strategy.bottom_limit]
+                    #top_pe = sum([float(i) for i in t])/strategy.top_limit
+                    #bottom_pe = sum([float(i) for i in b])/strategy.bottom_limit
+                    top_pe = t[strategy.top_limit-1]
+                    bottom_pe = b[strategy.bottom_limit-1]
+                    print("==H==", h.date, top_pe, strategy.top_limit)
+                    print("==L==", h.date, bottom_pe, strategy.bottom_limit)
+                    
+                    max_pe = metrics_value.get("Y%s" % year).get("h_pe_list")[0]
+                    min_pe = metrics_value.get("Y%s" % year).get("l_pe_list")[0]
+                    
+                    #metrics_value.get("Y%s" % year).get("h_pe_list").reverse()
+                    metrics_value.get("Y%s" % year).get("l_pe_list").reverse()
     
                 # 交易价格
                 price = float(h.open_price.normalize())
@@ -267,8 +279,11 @@ def calculate(request):
                 # 均值策略V1
                 else:
                     if pe <= bottom_pe:
+                        last_b_limit = 0 # 上一次的估值区间
                         for r in low_rules:
-                            if pe <= float(metrics_value.get("Y%s" % year).get("avgL%sPE" % r.limit)):
+                            b = metrics_value.get("Y%s" % year).get("l_pe_list")[last_b_limit:r.limit]
+                            #print(h.date, '低%d-%d' % (last_b_limit, r.limit), b, pe, sum([float(i) for i in b])/(r.limit-last_b_limit))
+                            if pe <= sum([float(i) for i in b])/(r.limit-last_b_limit):
                                 pe_rank = r.name
                                 c = floor((day_value * (r.holding/100)) / price)
                                 if c > s_count:
@@ -277,7 +292,8 @@ def calculate(request):
                                 else:
                                     money += (s_count-c)*price
                                     s_count -= (s_count-c)
-                            
+                                
+                                last_b_limit = r.limit # 收紧为上一次的估值区间
                                 break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
                         
                         # 当日收盘总资产
@@ -287,8 +303,11 @@ def calculate(request):
                         draw_date_list.append(h.date)
                         
                     elif pe >= top_pe:
+                        last_t_limit = 0 # 上一次的估值区间
                         for r in high_rules:
-                            if pe >= float(metrics_value.get("Y%s" % year).get("avgH%sPE" % r.limit)):
+                            t = metrics_value.get("Y%s" % year).get("h_pe_list")[last_t_limit:r.limit]
+                            #print(h.date, '高%d-%d' % (last_t_limit, r.limit), t, pe, sum([float(i) for i in t])/(r.limit-last_t_limit))
+                            if pe >= sum([float(i) for i in t])/(r.limit-last_t_limit):
                                 pe_rank = r.name
                                 c = floor((day_value * (r.holding/100)) / price)
                                 if c < s_count:
@@ -298,6 +317,7 @@ def calculate(request):
                                     money -= (c-s_count)*price
                                     s_count += (c-s_count)
                             
+                                last_t_limit = r.limit # 收紧为上一次的估值区间
                                 break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
                             
                         # 当日收盘总资产

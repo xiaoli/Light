@@ -25,6 +25,8 @@ class Command(BaseCommand):
             # metrics_value__isnull=True 仅计算未计算过的数据
             h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, metrics_value__isnull=True)
             
+            #h_list = KHistory.objects.filter(date="2021-07-13", stock=s)
+            
             print(h_list.count())
             for h in h_list:
                 print(h.date, h.id)
@@ -58,9 +60,11 @@ class Command(BaseCommand):
                     current_year["l_pe_list"] = []
                     for x in range(0, 30):
                         h_pe = all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)].aggregate(Sum('peTTM'))
+                        #print(all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)], len(h_pe), int(all_pe_set.count() * 0.01), h_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01))
                         current_year["h_pe_list"].append( h_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01) )
                         l_pe = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)].aggregate(Sum('peTTM'))
                         current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01) )
+                        #print(l_pe, len(l_pe), int(all_pe_set.count() * 0.01), l_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01))
                     
                     json_value_list["Y%s" % i] = current_year
                 
