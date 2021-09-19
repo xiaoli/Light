@@ -24,8 +24,7 @@ class Command(BaseCommand):
         for s in my_stocks:
             # metrics_value__isnull=True 仅计算未计算过的数据
             h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, metrics_value__isnull=True)
-            
-            #h_list = KHistory.objects.filter(date="2021-07-13", stock=s)
+            #h_list = KHistory.objects.filter(date="2019-02-19", stock=s)
             
             print(h_list.count())
             for h in h_list:
@@ -34,6 +33,7 @@ class Command(BaseCommand):
                 
                 # 保存至数据库的所有数据
                 json_value_list = {}
+                # 计算 1-10 年
                 for i in range(1, 11):
                     # 当前年份下的数据
                     current_year = {}
@@ -59,12 +59,14 @@ class Command(BaseCommand):
                     current_year["h_pe_list"] = []
                     current_year["l_pe_list"] = []
                     for x in range(0, 30):
-                        h_pe = all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)].aggregate(Sum('peTTM'))
-                        #print(all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)], len(h_pe), int(all_pe_set.count() * 0.01), h_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01))
-                        current_year["h_pe_list"].append( h_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01) )
-                        l_pe = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)].aggregate(Sum('peTTM'))
-                        current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01) )
-                        #print(l_pe, len(l_pe), int(all_pe_set.count() * 0.01), l_pe.get('peTTM__sum') / int(all_pe_set.count() * 0.01))
+                        h_pe_list = all_pe_set.order_by('-peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)]
+                        h_pe = h_pe_list.aggregate(Sum('peTTM'))
+                        #print(h_pe_list.values_list('peTTM', flat = True), len(h_pe_list), int(all_pe_set.count() * 0.01), h_pe.get('peTTM__sum') / len(h_pe_list))
+                        current_year["h_pe_list"].append( h_pe.get('peTTM__sum') / len(h_pe_list) )
+                        l_pe_list = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)]
+                        l_pe = l_pe_list.aggregate(Sum('peTTM'))
+                        current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / len(h_pe_list) )
+                        #print(l_pe_list.values_list('peTTM', flat = True), len(l_pe_list), int(all_pe_set.count() * 0.01), l_pe.get('peTTM__sum') / len(l_pe_list))
                     
                     json_value_list["Y%s" % i] = current_year
                 
