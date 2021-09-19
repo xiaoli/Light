@@ -26,7 +26,7 @@ class Command(BaseCommand):
             h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, metrics_value__isnull=True)
             #h_list = KHistory.objects.filter(date="2019-02-19", stock=s)
             
-            print(h_list.count())
+            print(s.code_name, h_list.count())
             for h in h_list:
                 print(h.date, h.id)
                 end_date = h.date#date.fromisoformat(h.date)
@@ -71,7 +71,7 @@ class Command(BaseCommand):
                     
                         json_value_list["Y%s" % i] = current_year
                     except Exception as e:
-                        pass
+                        print("PE 计算错误：", s.code_name, h.date, h.id)
                 
                 h.metrics_value = json.dumps(json_value_list, use_decimal=True)
                 #print(h.metrics_value)
