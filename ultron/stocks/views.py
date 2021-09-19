@@ -202,7 +202,10 @@ def calculate(request):
                 bottom_pe = min_pe + pe_range * (strategy.bottom_limit/100)
                 
                 # 均值策略V1
+                # t 由高到低
+                # b 由低到高
                 if strategy.s_type == 3:
+                    
                     t = metrics_value.get("Y%s" % year).get("h_pe_list")[:strategy.top_limit]
                     b = metrics_value.get("Y%s" % year).get("l_pe_list")[:strategy.bottom_limit]
                     #top_pe = sum([float(i) for i in t])/strategy.top_limit
@@ -216,8 +219,9 @@ def calculate(request):
                     min_pe = metrics_value.get("Y%s" % year).get("l_pe_list")[0]
                     #print("=MAX=", max_pe, min_pe)
                     
+                    # b 改成由高到低
                     #metrics_value.get("Y%s" % year).get("h_pe_list").reverse()
-                    metrics_value.get("Y%s" % year).get("l_pe_list").reverse()
+                    #metrics_value.get("Y%s" % year).get("l_pe_list").reverse()
     
                 # 交易价格
                 price = float(h.open_price.normalize())
@@ -288,7 +292,7 @@ def calculate(request):
                             
                             #直接取点值
                             b = metrics_value.get("Y%s" % year).get("l_pe_list")[r.limit-1]
-                            
+                            print(h.date, "低", r.limit, b, metrics_value.get("Y%s" % year).get("l_pe_list")[:30])
                             #print(h.date, '低%d-%d' % (last_b_limit, r.limit), b, pe, sum([float(i) for i in b])/(r.limit-last_b_limit))
                             
                             #取平均值
@@ -319,6 +323,7 @@ def calculate(request):
                         for r in high_rules:
                             #t = metrics_value.get("Y%s" % year).get("h_pe_list")[last_t_limit:r.limit]
                             t = metrics_value.get("Y%s" % year).get("h_pe_list")[r.limit-1]
+                            print(h.date, "高", r.limit, t, metrics_value.get("Y%s" % year).get("h_pe_list")[:30])
                             #print(h.date, '高%d-%d' % (last_t_limit, r.limit), t, pe, sum([float(i) for i in t])/(r.limit-last_t_limit))
                             #if pe >= sum([float(i) for i in t])/(r.limit-last_t_limit):
                             if pe >= t:
@@ -336,12 +341,13 @@ def calculate(request):
                             
                         # 当日收盘总资产
                         day_value = money+s_count*price
-                        str_list.append(str(r.id) + r.name + "%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        str_list.append("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                         draw_value_list.append(day_value)
                         draw_date_list.append(h.date)
                 
                     else:
                         # 当日收盘总资产
+                        print(h.date, "无档位", pe, top_pe, bottom_pe, max_pe, min_pe)
                         day_value = money+s_count*price
                         pe_rank = '无档位'
                         str_list.append("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
