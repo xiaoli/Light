@@ -66,7 +66,7 @@ class Command(BaseCommand):
                             current_year["h_pe_list"].append( h_pe.get('peTTM__sum') / len(h_pe_list) )
                             l_pe_list = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)]
                             l_pe = l_pe_list.aggregate(Sum('peTTM'))
-                            current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / len(h_pe_list) )
+                            current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / len(l_pe_list) )
                             #print(l_pe_list.values_list('peTTM', flat = True), len(l_pe_list), int(all_pe_set.count() * 0.01), l_pe.get('peTTM__sum') / len(l_pe_list))
                     
                         json_value_list["Y%s" % i] = current_year
