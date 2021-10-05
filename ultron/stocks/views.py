@@ -115,7 +115,7 @@ def MaxDrawdown(return_list):
     # 2. then find the max drawndown point
     i = np.argmax((np.maximum.accumulate(return_list)- return_list)/np.maximum.accumulate(return_list))
     if i == 0:
-        return 0
+        return 0,0,0
     j = np.argmax(return_list[:i])
 
     # 3. return the maxdrawndown
