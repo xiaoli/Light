@@ -178,10 +178,13 @@ def calculate(request):
         draw_date_list = []
 
         
-        h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s)
+        h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True)
     
         for h in h_list:
             metrics_value = json.loads(h.metrics_value)
+            
+            # 交易价格
+            price = float(h.open_price.normalize())
         
             # 每周二之后交易
             if (h.date - d).days >= 7:
@@ -223,8 +226,6 @@ def calculate(request):
                     #metrics_value.get("Y%s" % year).get("h_pe_list").reverse()
                     #metrics_value.get("Y%s" % year).get("l_pe_list").reverse()
     
-                # 交易价格
-                price = float(h.open_price.normalize())
                 #str_list.append(top_pe, bottom_pe)
             
                 # 当日开盘总资产
@@ -379,9 +380,13 @@ def calculate(request):
                 d = d + timedelta(days=7)
                 #str_list.append(c, "==========")
             
-        str_list.append("===投资结果===")
-        str_list.append("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
-        str_list.append("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
+            str_list.append("===投资结果===")
+            str_list.append("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
+            str_list.append("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
+            
+            total_money += money
+            total_stocks += s_count
+            total_stocks_value += price * s_count
     
         # 如果没有包含值，就不要计算回撤了
         if draw_value_list:
@@ -389,9 +394,6 @@ def calculate(request):
             str_list.append( "%s 最大回撤%s 开始日期%s 结束日期%s" % ( h.stock.code_name, "{:.2%}".format(drawndown), draw_date_list[startdate], draw_date_list[enddate]) )
     
         str_list.append("")
-        total_money += money
-        total_stocks += s_count
-        total_stocks_value += price * s_count
     
     str_list.append("===总投资结果===")
     # 总价值
