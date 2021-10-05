@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
         for s in my_stocks:
             # metrics_value__isnull=True 仅计算未计算过的数据
-            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, metrics_value__isnull=True)
+            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, peTTM__isnull=False, metrics_value__isnull=True)
             #h_list = KHistory.objects.filter(date="2019-02-19", stock=s)
             
             print(s.code_name, h_list.count())
@@ -41,7 +41,7 @@ class Command(BaseCommand):
                     
                         start_date = end_date.replace( year = end_date.year - i )
 
-                        all_pe_set = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).exclude(peTTM=0)
+                        all_pe_set = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True)
                     
                         # MM策略所需
                         pe = all_pe_set.aggregate(Avg('peTTM'), Max('peTTM'), Min('peTTM'))
