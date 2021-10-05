@@ -176,6 +176,9 @@ def calculate(request):
         draw_value_list = []
         # 回撤的日期list
         draw_date_list = []
+        
+        # 当日收盘价
+        price = 0
 
         
         h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True)
@@ -380,10 +383,6 @@ def calculate(request):
                 d = d + timedelta(days=7)
                 #str_list.append(c, "==========")
             
-            str_list.append("===投资结果===")
-            str_list.append("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
-            str_list.append("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
-            
             total_money += money
             total_stocks += s_count
             total_stocks_value += price * s_count
@@ -392,7 +391,10 @@ def calculate(request):
         if draw_value_list:
             drawndown,startdate,enddate = MaxDrawdown(draw_value_list)
             str_list.append( "%s 最大回撤%s 开始日期%s 结束日期%s" % ( h.stock.code_name, "{:.2%}".format(drawndown), draw_date_list[startdate], draw_date_list[enddate]) )
-    
+
+        str_list.append("===投资结果===")
+        str_list.append("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
+        str_list.append("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
         str_list.append("")
     
     str_list.append("===总投资结果===")
