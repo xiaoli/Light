@@ -186,8 +186,8 @@ def calculate(request):
         for h in h_list:
             metrics_value = json.loads(h.metrics_value)
             
-            # 交易价格
-            price = float(h.open_price.normalize())
+            # 交易价格 @20211005 改为收盘价
+            price = float(h.close_price.normalize())
         
             # 每周二之后交易
             if (h.date - d).days >= 7:
