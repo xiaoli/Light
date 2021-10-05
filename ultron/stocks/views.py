@@ -253,7 +253,7 @@ def calculate(request):
                         # 当日收盘总资产
                         day_value = money+s_count*price
                         str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
-                        draw_value_list.append(money+s_count*price)
+                        draw_value_list.append(day_value)
                         draw_date_list.append(h.date)
                         
                     elif pe >= top_pe:
@@ -326,7 +326,7 @@ def calculate(request):
                         str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                         # 只有操作了，才能记录下回撤
                         if flag_b_action:
-                            draw_value_list.append(money+s_count*price)
+                            draw_value_list.append(day_value)
                             draw_date_list.append(h.date)
                         
                     elif pe >= top_pe:
