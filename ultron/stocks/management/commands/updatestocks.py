@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from datetime import date
+from datetime import date, datetime
 import json
 import requests
 import sys
@@ -9,6 +9,10 @@ from stocks.models import Stock, KHistory
 
 import baostock as bs
 import pandas as pd
+
+import urllib3
+from urllib3 import poolmanager
+urllib3.disable_warnings()
 
 class Command(BaseCommand):
     help = '更新证券数据'
@@ -44,30 +48,63 @@ class Command(BaseCommand):
         
         my_stocks = Stock.objects.all()
         #my_stocks = ['sh.950090', 'sz.159965']
+        
+        my_token = "ab51eeca-033d-4cef-98ed-bbc18c01fad8"
+        api_url = "https://open.lixinger.com/api/a/index"
+        headers = {
+            'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows 98)',
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip',
+        }
 
         for s in my_stocks:
-            # 获取证券基本资料
-            rs = bs.query_stock_basic(code=s.code)
-            # rs = bs.query_stock_basic(code_name="浦发银行")  # 支持模糊查询
-            #print('query_stock_basic respond error_code:'+rs.error_code)
-            #print('query_stock_basic respond  error_msg:'+rs.error_msg)
+            if s.ipo_type == 1:
+                # 获取证券基本资料
+                rs = bs.query_stock_basic(code=s.code)
+                # rs = bs.query_stock_basic(code_name="浦发银行")  # 支持模糊查询
+                #print('query_stock_basic respond error_code:'+rs.error_code)
+                #print('query_stock_basic respond  error_msg:'+rs.error_msg)
 
-            # 打印结果集
-            while (rs.error_code == '0') & rs.next():
-                # 获取一条记录，将记录合并在一起
-                x = rs.get_row_data()
-                print(x)
-                try:
-                    s.code_name = x[1]
-                    s.ipo_date = date(*map(int, x[2].split('-')))
-                    s.out_date = None if not x[3] else date(*map(int, x[3].split('-')))
-                    s.ipo_type = x[4]
-                    s.ipo_status = x[5]
-                    s.save()
-                except Exception as e:
-                    print(x[0])
-                    print(sys.exc_info())
-                    print("%s cannot be saved. %s" % (x[0], sys.exc_info()[1]))
+                # 打印结果集
+                while (rs.error_code == '0') & rs.next():
+                    # 获取一条记录，将记录合并在一起
+                    x = rs.get_row_data()
+                    print(x)
+                    try:
+                        s.code_name = x[1]
+                        s.ipo_date = date(*map(int, x[2].split('-')))
+                        s.out_date = None if not x[3] else date(*map(int, x[3].split('-')))
+                        s.ipo_type = x[4]
+                        s.ipo_status = x[5]
+                        s.save()
+                    except Exception as e:
+                        print(x[0])
+                        print(sys.exc_info())
+                        print("%s cannot be saved. %s" % (x[0], sys.exc_info()[1]))
+            else:
+                data = {
+                    'token': my_token,
+                    "stockCodes": [
+                        s.code
+                    ]
+                }
+                
+                print(data)
+            
+                r = requests.post(api_url, data=json.dumps(data), headers=headers, verify=False)
+                
+                x = json.loads(r.text)
+                for p in x.get("data"):
+                    print(p)
+                    try:
+                        s.code_name = p.get('name')
+                        s.ipo_date = datetime.fromisoformat(p.get('launchDate').replace('Z', ''))
+                        s.save()
+                    except Exception as e:
+                        print(x[0])
+                        print(sys.exc_info())
+                        print("%s cannot be saved. %s" % (x[0], sys.exc_info()[1]))
                     
         #### 登出系统 ####
         bs.logout()
