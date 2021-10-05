@@ -382,10 +382,6 @@ def calculate(request):
                 # 调整到下周二
                 d = d + timedelta(days=7)
                 #str_list.append(c, "==========")
-            
-            total_money += money
-            total_stocks += s_count
-            total_stocks_value += price * s_count
     
         # 如果没有包含值，就不要计算回撤了
         if draw_value_list:
@@ -396,6 +392,10 @@ def calculate(request):
         str_list.append("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
         str_list.append("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
         str_list.append("")
+        
+        total_money += money
+        total_stocks += s_count
+        total_stocks_value += price * s_count
     
     str_list.append("===总投资结果===")
     # 总价值
