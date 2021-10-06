@@ -26,6 +26,7 @@ class Stock(models.Model):
         default=1,
         verbose_name="上市状态"
     )
+    object_fund = models.TextField(blank=True, null=True, verbose_name="可操作基金")
     
     def __str__(self):
         return '%s' % (self.code_name)

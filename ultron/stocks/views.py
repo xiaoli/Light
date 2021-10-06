@@ -25,9 +25,36 @@ from .serializers import json_serialize
 
 @login_required(login_url='/admin/login/')
 def index(request):
+    s_list = Stock.objects.filter(ipo_type=2)
+    r_list = []
+    
+    year = 10
+    
+    for s in s_list:
+        kh = KHistory.objects.filter(stock=s).order_by('-date')[0]
+        metrics_value = json.loads(kh.metrics_value)
+        s.h_pe = metrics_value.get("Y%s" % year).get("h_pe_list")[-1]
+        s.l_pe = metrics_value.get("Y%s" % year).get("l_pe_list")[-1]
+        s.pe_date = kh.date
+        s.pe_value = kh.peTTM
+        
+        r_list.append(s)
+        #print(metrics_value.get("Y%s" % year).get("h_pe_list"), metrics_value.get("Y%s" % year).get("l_pe_list"))
+    
+    template = loader.get_template('list_report.html')
+
+    context = {
+        's_list': r_list,
+        'user': request.user
+    }
+    return HttpResponse(template.render(context, request))
+
+
+@login_required(login_url='/admin/login/')
+def list_khistory(request):
     s_list = Stock.objects.all()
     
-    template = loader.get_template('index.html')
+    template = loader.get_template('list_khistory.html')
 
     context = {
         's_list': s_list,
@@ -181,7 +208,7 @@ def calculate(request):
         price = 0
 
         
-        h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True)
+        h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True).exclude(metrics_value=u'').exclude(metrics_value__isnull=True)
     
         for h in h_list:
             metrics_value = json.loads(h.metrics_value)

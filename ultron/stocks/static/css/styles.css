@@ -5,12 +5,6 @@ html, body {
   height: 100%;
 }
 
-.navbar {
-    background: #27293d;
-    border-bottom: 1px solid #353a53;
-    box-shadow: 18px 5px 10px #222334;
-}
-
 .navbar-brand {
   margin: 0 20px;
     width: 100%;
