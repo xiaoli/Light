@@ -33,8 +33,10 @@ def index(request):
     for s in s_list:
         kh = KHistory.objects.filter(stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True).exclude(metrics_value=u'').exclude(metrics_value__isnull=True).order_by('-date')[0]
         metrics_value = json.loads(kh.metrics_value)
-        s.h_pe = metrics_value.get("Y%s" % year).get("h_pe_list")[-1]
-        s.l_pe = metrics_value.get("Y%s" % year).get("l_pe_list")[-1]
+        pe_list = metrics_value.get("Y%s" % year)
+        if len(pe_list) > 0:
+            s.h_pe = pe_list.get("h_pe_list")[-1]
+            s.l_pe = pe_list.get("l_pe_list")[-1]
         s.pe_date = kh.date
         s.pe_value = kh.peTTM
         
