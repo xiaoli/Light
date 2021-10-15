@@ -123,13 +123,13 @@ class Command(BaseCommand):
                     x = json.loads(r.text)
                     for p in x.get("data"):
                         try:
-                            #print(p.get("date")[:10], p.get("pe_ttm").get("mcw"))
+                            print(p.get("date")[:10], p.get("pe_ttm").get("mcw"))
                             k, _ = KHistory.objects.get_or_create(stock=stock, date=p.get("date")[:10])
                             k.peTTM = p.get("pe_ttm").get("mcw")
                             k.close_price = p.get("cp")
                             k.save()
-                        except (Stock.DoesNotExist, Exception) as e:
-                            print("%s %s cannot be saved. %s" % (x[1], x[0], sys.exc_info()[1]))
+                        #except (Stock.DoesNotExist, Exception) as e:
+                        #    print("%s %s cannot be saved. %s" % (x[1], x[0], sys.exc_info()[1]))
                         except Exception as e:
                             pass
                     

@@ -8,5 +8,8 @@ python manage.py updatehistory --settings=ultron.settings.prod
 #python manage.py updatehistorype --settings=ultron.settings.prod
 #python manage.py avgpe --settings=ultron.settings.prod
 
+# updatehistory 是从数据库最后一天数据，更新到今天--往后更新
+# importhistory 是从1990开始，更新到数据库最早的一天--往前更新
+
 dt=$(date '+%d/%m/%Y %H:%M:%S');
 echo "$dt" >> /srv/www/test.log
