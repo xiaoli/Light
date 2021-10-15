@@ -235,11 +235,14 @@ def calculate(request):
     
                 # 均值策略 或 MM策略
                 if strategy.s_type != 3:
+                    # 低估时
                     if pe <= bottom_pe:
                         for r in low_rules:
                             if pe <= min_pe + pe_range * (r.limit/100):
                                 pe_rank = r.name
+                                # 计算出需要持有的股票数c
                                 c = floor((day_value * (r.holding/100)) / price)
+                                # 如果需要持有的股票数c大于现在持有的股票数s_count
                                 if c > s_count:
                                     money -= (c-s_count)*price
                                     s_count += (c-s_count)
@@ -255,6 +258,7 @@ def calculate(request):
                         draw_value_list.append(money+s_count*price)
                         draw_date_list.append(h.date)
                         
+                    # 高估时
                     elif pe >= top_pe:
                         for r in high_rules:
                             if pe >= max_pe - pe_range * (r.limit/100):
