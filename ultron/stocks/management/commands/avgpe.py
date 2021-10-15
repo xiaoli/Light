@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
         for s in my_stocks:
             # metrics_value__isnull=True 仅计算未计算过的数据
-            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, metrics_value__isnull=True)
+            h_list = KHistory.objects.filter(date__gte="2019-01-01", stock=s, peTTM__isnull=False, metrics_value__isnull=True)
             #h_list = KHistory.objects.filter(date="2019-02-19", stock=s)
             
             print(s.code_name, h_list.count())
@@ -41,7 +41,7 @@ class Command(BaseCommand):
                     
                         start_date = end_date.replace( year = end_date.year - i )
 
-                        all_pe_set = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).exclude(peTTM=0)
+                        all_pe_set = KHistory.objects.filter(date__gte=start_date, date__lt=end_date, stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True)
                     
                         # MM策略所需
                         pe = all_pe_set.aggregate(Avg('peTTM'), Max('peTTM'), Min('peTTM'))
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                             current_year["h_pe_list"].append( h_pe.get('peTTM__sum') / len(h_pe_list) )
                             l_pe_list = all_pe_set.order_by('peTTM')[int(all_pe_set.count() * x * 0.01):int(all_pe_set.count() * (x+1) * 0.01)]
                             l_pe = l_pe_list.aggregate(Sum('peTTM'))
-                            current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / len(h_pe_list) )
+                            current_year["l_pe_list"].append( l_pe.get('peTTM__sum') / len(l_pe_list) )
                             #print(l_pe_list.values_list('peTTM', flat = True), len(l_pe_list), int(all_pe_set.count() * 0.01), l_pe.get('peTTM__sum') / len(l_pe_list))
                     
                         json_value_list["Y%s" % i] = current_year

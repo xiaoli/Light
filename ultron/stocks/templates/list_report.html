@@ -1,0 +1,39 @@
+{% extends "new_base.html" %}
+
+{% block content %}
+<div class="row content">
+    <div class="row mb-3">
+        <div class="col-sm-12">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                    <th scope="col">指数代码</th>
+                    <th scope="col">指数名称</th>
+                    <th scope="col">发布时间</th>
+                    <th scope="col">当前日期</th>
+                    <th scope="col">当前PE</th>
+                    <th scope="col">30%高估线</th>
+                    <th scope="col">30%低估线</th>
+                    <th scope="col">可操作基金</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for s in s_list %}
+                  <tr>
+                      <td>{{ s.code }}</td>
+                      <td>{{ s.code_name }}</td>
+                      <td>{{ s.ipo_date }}</td>
+                      <td>{{ s.pe_date }}</td>
+                      <td>{{ s.pe_value }}<span class="badge rounded-pill {% if s.pe_value >= s.h_pe %}bg-danger{% elif s.pe_value <= s.l_pe %}bg-success{% else %}bg-light{% endif %}">{% if s.pe_value >= s.h_pe %}高{% elif s.pe_value <= s.l_pe %}低{% endif %}</span>
+                      </td>
+                      <td>{{ s.h_pe }}</td>
+                      <td>{{ s.l_pe }}</td>
+                      <td>{{ s.object_fund }}</td>
+                  </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

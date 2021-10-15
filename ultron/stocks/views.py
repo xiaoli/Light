@@ -25,9 +25,38 @@ from .serializers import json_serialize
 
 @login_required(login_url='/admin/login/')
 def index(request):
+    s_list = Stock.objects.filter(ipo_type=2)
+    r_list = []
+    
+    year = 10
+    
+    for s in s_list:
+        kh = KHistory.objects.filter(stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True).exclude(metrics_value=u'').exclude(metrics_value__isnull=True).order_by('-date')[0]
+        metrics_value = json.loads(kh.metrics_value)
+        pe_list = metrics_value.get("Y%s" % year)
+        if pe_list and len(pe_list) > 0:
+            s.h_pe = pe_list.get("h_pe_list")[-1]
+            s.l_pe = pe_list.get("l_pe_list")[-1]
+        s.pe_date = kh.date
+        s.pe_value = kh.peTTM
+        
+        r_list.append(s)
+        #print(metrics_value.get("Y%s" % year).get("h_pe_list"), metrics_value.get("Y%s" % year).get("l_pe_list"))
+    
+    template = loader.get_template('list_report.html')
+
+    context = {
+        's_list': r_list,
+        'user': request.user
+    }
+    return HttpResponse(template.render(context, request))
+
+
+@login_required(login_url='/admin/login/')
+def list_khistory(request):
     s_list = Stock.objects.all()
     
-    template = loader.get_template('index.html')
+    template = loader.get_template('list_khistory.html')
 
     context = {
         's_list': s_list,
@@ -115,7 +144,7 @@ def MaxDrawdown(return_list):
     # 2. then find the max drawndown point
     i = np.argmax((np.maximum.accumulate(return_list)- return_list)/np.maximum.accumulate(return_list))
     if i == 0:
-        return 0
+        return 0,0,0
     j = np.argmax(return_list[:i])
 
     # 3. return the maxdrawndown
@@ -176,12 +205,18 @@ def calculate(request):
         draw_value_list = []
         # 回撤的日期list
         draw_date_list = []
+        
+        # 当日收盘价
+        price = 0
 
         
-        h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s)
+        h_list = KHistory.objects.filter(date__gte=d, trades_tatus=1, stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True).exclude(metrics_value=u'').exclude(metrics_value__isnull=True)
     
         for h in h_list:
             metrics_value = json.loads(h.metrics_value)
+            
+            # 交易价格 @20211005 改为收盘价
+            price = float(h.close_price.normalize())
         
             # 每周二之后交易
             if (h.date - d).days >= 7:
@@ -223,8 +258,6 @@ def calculate(request):
                     #metrics_value.get("Y%s" % year).get("h_pe_list").reverse()
                     #metrics_value.get("Y%s" % year).get("l_pe_list").reverse()
     
-                # 交易价格
-                price = float(h.open_price.normalize())
                 #str_list.append(top_pe, bottom_pe)
             
                 # 当日开盘总资产
@@ -246,16 +279,17 @@ def calculate(request):
                                 if c > s_count:
                                     money -= (c-s_count)*price
                                     s_count += (c-s_count)
-                                else:
-                                    money += (s_count-c)*price
-                                    s_count -= (s_count-c)
+                                # @20211004 低估只有买入，高估只有卖出    
+                                #else:
+                                #    money += (s_count-c)*price
+                                #    s_count -= (s_count-c)
                             
                                 break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
                         
                         # 当日收盘总资产
                         day_value = money+s_count*price
                         str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
-                        draw_value_list.append(money+s_count*price)
+                        draw_value_list.append(day_value)
                         draw_date_list.append(h.date)
                         
                     # 高估时
@@ -267,15 +301,16 @@ def calculate(request):
                                 if c < s_count:
                                     money += (s_count-c)*price
                                     s_count -= (s_count-c)
-                                else:
-                                    money -= (c-s_count)*price
-                                    s_count += (c-s_count)
+                                # @20211004 低估只有买入，高估只有卖出
+                                #else:
+                                #    money -= (c-s_count)*price
+                                #    s_count += (c-s_count)
                             
                                 break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
                             
                         # 当日收盘总资产
                         day_value = money+s_count*price
-                        str_list.append(str(r.id) + r.name + "%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
+                        str_list.append("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
                         draw_value_list.append(day_value)
                         draw_date_list.append(h.date)
                 
@@ -289,6 +324,7 @@ def calculate(request):
                 else:
                     if pe <= bottom_pe:
                         last_b_limit = 0 # 上一次的估值区间
+                        flag_b_action = False # 是否执行过卖出操作
                         for r in low_rules:
                             
                             #取平均值
@@ -296,7 +332,8 @@ def calculate(request):
                             
                             #直接取点值
                             b = metrics_value.get("Y%s" % year).get("l_pe_list")[r.limit-1]
-                            print(h.date, "低", r.limit, b, metrics_value.get("Y%s" % year).get("l_pe_list")[:30])
+                            
+                            #print(h.date, "低", r.limit, b, metrics_value.get("Y%s" % year).get("l_pe_list")[:30])
                             #print(h.date, '低%d-%d' % (last_b_limit, r.limit), b, pe, sum([float(i) for i in b])/(r.limit-last_b_limit))
                             
                             #取平均值
@@ -309,49 +346,67 @@ def calculate(request):
                                 if c > s_count:
                                     money -= (c-s_count)*price
                                     s_count += (c-s_count)
-                                else:
-                                    money += (s_count-c)*price
-                                    s_count -= (s_count-c)
                                 
-                                last_b_limit = r.limit # 收紧为上一次的估值区间
+                                # @20211004 低估只有买入，高估只有卖出
+                                #else:
+                                #    money += (s_count-c)*price
+                                #    s_count -= (s_count-c)
+                                
+                                    last_b_limit = r.limit # 收紧为上一次的估值区间
+                                    flag_b_action = True
                                 break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
                         
                         # 当日收盘总资产
                         day_value = money+s_count*price
+                        if not pe_rank:
+                            pe_rank = '无规则匹配'
                         str_list.append("%s, %s, 低, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
-                        draw_value_list.append(money+s_count*price)
-                        draw_date_list.append(h.date)
+                        # 只有操作了，才能记录下回撤
+                        if flag_b_action:
+                            draw_value_list.append(day_value)
+                            draw_date_list.append(h.date)
                         
                     elif pe >= top_pe:
                         last_t_limit = 0 # 上一次的估值区间
+                        flag_t_action = False # 是否执行过买入操作
                         for r in high_rules:
-                            #t = metrics_value.get("Y%s" % year).get("h_pe_list")[last_t_limit:r.limit]
-                            t = metrics_value.get("Y%s" % year).get("h_pe_list")[r.limit-1]
-                            print(h.date, "高", r.limit, t, metrics_value.get("Y%s" % year).get("h_pe_list")[:30])
+                            # 取平均值
+                            t = metrics_value.get("Y%s" % year).get("h_pe_list")[last_t_limit:r.limit]
+                            #print(h.date, "高", pe, r.limit, sum([float(i) for i in t])/(len(t)), metrics_value.get("Y%s" % year).get("h_pe_list")[:30])
+                            # 取点值
+                            #t = metrics_value.get("Y%s" % year).get("h_pe_list")[r.limit-1]
                             #print(h.date, '高%d-%d' % (last_t_limit, r.limit), t, pe, sum([float(i) for i in t])/(r.limit-last_t_limit))
-                            #if pe >= sum([float(i) for i in t])/(r.limit-last_t_limit):
-                            if pe >= t:
+                            # 平均值判定
+                            if pe >= sum([float(i) for i in t])/(len(t)):
+                            # 点值判定
+                            #if pe >= t:
                                 pe_rank = r.name
                                 c = floor((day_value * (r.holding/100)) / price)
                                 if c < s_count:
                                     money += (s_count-c)*price
                                     s_count -= (s_count-c)
-                                else:
-                                    money -= (c-s_count)*price
-                                    s_count += (c-s_count)
+                                # @20211004 低估只有买入，高估只有卖出
+                                #else:
+                                #    money -= (c-s_count)*price
+                                #    s_count += (c-s_count)
                             
-                                last_t_limit = r.limit # 收紧为上一次的估值区间
+                                    last_t_limit = r.limit # 收紧为上一次的估值区间
+                                    flag_t_action = True
                                 break # 只要有一条 rule 符合判断，那就退出整个 rule 循环
                             
                         # 当日收盘总资产
+                        #
                         day_value = money+s_count*price
+                        if not pe_rank:
+                            pe_rank = '无规则匹配'
                         str_list.append("%s, %s, 高, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
-                        draw_value_list.append(day_value)
-                        draw_date_list.append(h.date)
+                        if flag_t_action:
+                            draw_value_list.append(day_value)
+                            draw_date_list.append(h.date)
                 
                     else:
                         # 当日收盘总资产
-                        print(h.date, "无档位", pe, top_pe, bottom_pe, max_pe, min_pe)
+                        #print(h.date, "无档位", pe, top_pe, bottom_pe, max_pe, min_pe)
                         day_value = money+s_count*price
                         pe_rank = '无档位'
                         str_list.append("%s, %s, 无变化, %s, %f, %f, %f, %s, %s, %s, %s, %s, %s, %s" % (h.stock.code_name, h.date, pe_rank, h.peTTM, max_pe, min_pe, price, s_count, price*s_count, money,  "{:.2%}".format((price*s_count)/day_value), "{:.2%}".format(money/day_value), day_value))
@@ -359,16 +414,19 @@ def calculate(request):
                 # 更新下一次检查日
                 # 调整到下周二
                 d = d + timedelta(days=7)
-                #str_list.append(c, "==========")
-            
+                #str_list.append(c, "==========")    
+        
         str_list.append("===投资结果===")
         str_list.append("%s 剩余资金%f 剩余股票%d 股票价值%f === 总价值%f" % (h.stock.code_name, money, s_count, s_count*price, money+s_count*price))
         str_list.append("%s 绝对收益%s 复合年化收益率%s " % (h.stock.code_name, "{:.2%}".format(((money+s_count*price)/cost-1)), "{:.2%}".format((pow((money+s_count*price)/cost, 1/yrs)-1))) )
-    
-        drawndown,startdate,enddate = MaxDrawdown(draw_value_list)
-        str_list.append( "%s 最大回撤%s 开始日期%s 结束日期%s" % ( h.stock.code_name, "{:.2%}".format(drawndown), draw_date_list[startdate], draw_date_list[enddate]) )
-    
+        
+        # 如果没有包含值，就不要计算回撤了
+        if draw_value_list:
+            drawndown,startdate,enddate = MaxDrawdown(draw_value_list)
+            str_list.append( "%s 最大回撤%s 开始日期%s 结束日期%s" % ( h.stock.code_name, "{:.2%}".format(drawndown), draw_date_list[startdate], draw_date_list[enddate]) )
+        
         str_list.append("")
+        
         total_money += money
         total_stocks += s_count
         total_stocks_value += price * s_count
