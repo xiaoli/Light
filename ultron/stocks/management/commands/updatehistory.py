@@ -122,8 +122,8 @@ class Command(BaseCommand):
                 
                     x = json.loads(r.text)
                     for p in x.get("data"):
-                        print(p.get("date")[:10], p.get("pe_ttm").get("mcw"))
                         try:
+                            #print(p.get("date")[:10], p.get("pe_ttm").get("mcw"))
                             k, _ = KHistory.objects.get_or_create(stock=stock, date=p.get("date")[:10])
                             k.peTTM = p.get("pe_ttm").get("mcw")
                             k.close_price = p.get("cp")
