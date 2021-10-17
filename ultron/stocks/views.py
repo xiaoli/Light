@@ -81,13 +81,14 @@ def stock_index(request):
     
 @login_required(login_url='/admin/login/')
 def list_all_report(request):
-    sid = request.GET['sid']
+    # 股票ID
+    sid = request.GET.get('sid', 1)
+    # 考察年份
+    year = request.GET.get('year', 10)
     
     s = Stock.objects.get(pk=sid)
     h_list = KHistory.objects.filter(stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True).exclude(metrics_value=u'').exclude(metrics_value__isnull=True).order_by('-date')
-
     r_list = []
-    year = 10
     
     for h in h_list:
         metrics_value = json.loads(h.metrics_value)
@@ -103,6 +104,8 @@ def list_all_report(request):
     template = loader.get_template('list_all_report.html')
 
     context = {
+        'sid': sid,
+        'year': year,
         'r_list': r_list,
         'user': request.user
     }

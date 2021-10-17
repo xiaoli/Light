@@ -19,6 +19,24 @@
                 </tr>
               </thead>
               <tbody>
+                  <tr>
+                      <form action="{% url "list_all_report" %}" method="GET">
+                          <input name="sid" value="{{ sid }}" type="hidden">
+                      <td colspan="3"></td>
+                      <td>
+                          <select class="form-select" name="year">
+                            <option selected>选择PE计算年份</option>
+                            {% for i in '0123456789'|make_list %}
+                                <option value="{{ forloop.counter }}" {% if year == forloop.counter|stringformat:"i" %}selected{% endif %}>{{ forloop.counter }}年</option>
+                            {% endfor %}
+                          </select>
+                      </td>
+                      <td class="text-center">
+                          <input class="btn btn-info btn-sm" type="submit" value="查看">
+                      </td>
+                      <td colspan="3"></td>
+                      </form>
+                  </tr>
               {% for r in r_list %}
                   <tr>
                       <td>{{ r.stock.code }}</td>
