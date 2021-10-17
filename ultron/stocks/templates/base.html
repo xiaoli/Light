@@ -34,9 +34,13 @@
             {% url 'index' as index_url %}
             {% url 'list_strategy' as list_strategy_url %}
             {% url 'list_khistory' as list_khistory_url %}
+            {% url 'stock_index' as stock_index_url %}
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link {% if request.get_full_path == index_url %}active{% endif %}" aria-current="page" href="{% url 'index' %}">最新日报</a>
+              <a class="nav-link {% if request.get_full_path == index_url %}active{% endif %}"  href="{% url 'index' %}">指数日报</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.get_full_path == stock_index_url %}active{% endif %}" href="{% url 'stock_index' %}">股票日报</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.get_full_path == list_strategy_url %}active{% endif %}" href="{% url 'list_strategy' %}">策略回撤</a>

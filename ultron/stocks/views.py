@@ -51,6 +51,62 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
+@login_required(login_url='/admin/login/')
+def stock_index(request):
+    s_list = Stock.objects.filter(ipo_type=1)
+    r_list = []
+    
+    year = 10
+    
+    for s in s_list:
+        kh = KHistory.objects.filter(stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True).exclude(metrics_value=u'').exclude(metrics_value__isnull=True).order_by('-date')[0]
+        metrics_value = json.loads(kh.metrics_value)
+        pe_list = metrics_value.get("Y%s" % year)
+        if pe_list and len(pe_list) > 0:
+            s.h_pe = pe_list.get("h_pe_list")[-1]
+            s.l_pe = pe_list.get("l_pe_list")[-1]
+        s.pe_date = kh.date
+        s.pe_value = kh.peTTM
+        
+        r_list.append(s)
+        #print(metrics_value.get("Y%s" % year).get("h_pe_list"), metrics_value.get("Y%s" % year).get("l_pe_list"))
+    
+    template = loader.get_template('list_report.html')
+
+    context = {
+        's_list': r_list,
+        'user': request.user
+    }
+    return HttpResponse(template.render(context, request))
+    
+@login_required(login_url='/admin/login/')
+def list_all_report(request):
+    sid = request.GET['sid']
+    
+    s = Stock.objects.get(pk=sid)
+    h_list = KHistory.objects.filter(stock=s).exclude(peTTM=0).exclude(peTTM__isnull=True).exclude(metrics_value=u'').exclude(metrics_value__isnull=True).order_by('-date')
+
+    r_list = []
+    year = 10
+    
+    for h in h_list:
+        metrics_value = json.loads(h.metrics_value)
+        pe_list = metrics_value.get("Y%s" % year)
+        if pe_list and len(pe_list) > 0:
+            h.h_pe = pe_list.get("h_pe_list")[-1]
+            h.l_pe = pe_list.get("l_pe_list")[-1]
+        h.pe_date = h.date
+        h.pe_value = h.peTTM
+        
+        r_list.append(h)
+    
+    template = loader.get_template('list_all_report.html')
+
+    context = {
+        'r_list': r_list,
+        'user': request.user
+    }
+    return HttpResponse(template.render(context, request))
 
 @login_required(login_url='/admin/login/')
 def list_khistory(request):

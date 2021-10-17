@@ -9,5 +9,7 @@ urlpatterns = [
     path('list_strategy', views.list_strategy, name='list_strategy'),
     path('calculate', views.calculate, name='calculate'),
     path('list_khistory', views.list_khistory, name='list_khistory'),
+    path('list_all_report', views.list_all_report, name='list_all_report'),
+    path('stock_index', views.stock_index, name='stock_index'),
     path('', views.index, name='index')
 ]
