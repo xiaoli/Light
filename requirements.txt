@@ -5,3 +5,4 @@ django
 futu-api
 numpy
 simplejson
+django-user-visit
