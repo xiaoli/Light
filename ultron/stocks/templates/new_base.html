@@ -36,7 +36,7 @@
               <a class="nav-link {% if request.get_full_path == stock_index_url %}active{% endif %}"  href="{% url 'stock_index' %}">股票日报</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% if request.get_full_path == list_strategy_url %}active{% endif %}" href="{% url 'list_strategy' %}">策略回撤</a>
+              <a class="nav-link {% if request.get_full_path == list_strategy_url %}active{% endif %}" href="{% url 'list_strategy' %}">策略回测</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.get_full_path == list_khistory_url %}active{% endif %}" href="{% url 'list_khistory' %}">K线图</a>
