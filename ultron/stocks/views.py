@@ -47,6 +47,7 @@ def index(request):
 
     context = {
         's_list': r_list,
+        'ipo_type': 2,
         'user': request.user
     }
     return HttpResponse(template.render(context, request))
