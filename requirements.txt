@@ -1,8 +1,8 @@
 requests
 pandas
-tushare
+#tushare
 django
-futu-api
+#futu-api
 numpy
 simplejson
-django-user-visit
+#django-user-visit

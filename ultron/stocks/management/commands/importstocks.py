@@ -42,8 +42,9 @@ class Command(BaseCommand):
         #300消费 sh.000912
         #央视50 sz.159965 基金 拿不到
         
-        my_stocks = ['sh.000300', 'sh.000922', 'sh.000170', 'sh.000905', 'sh.000978', 'sh.000912', 'sh.159965']
+        #my_stocks = ['sh.000300', 'sh.000922', 'sh.000170', 'sh.000905', 'sh.000978', 'sh.000912', 'sh.159965']
         #my_stocks = ['sh.950090', 'sz.159965']
+        my_stocks = ['sz.300108']
 
         for stock_code in my_stocks:
             # 获取证券基本资料

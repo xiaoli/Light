@@ -152,10 +152,10 @@ var point_list;
       series2.clustered = false;
       series2.dataFields.valueY = "volume";
       series2.yAxis = valueAxis2;
-      series2.tooltipText = "{valueY.value}";
+      series2.tooltipText = "日期：{date}\n成交数量 {valueY.value}";
       series2.name = "成交数量";
       // volume should be summed
-      series2.groupFields.valueY = "sum";
+      //series2.groupFields.valueY = "sum";
       series2.defaultState.transitionDuration = 0;
       
       // PE 展示
@@ -181,7 +181,7 @@ var point_list;
       series3.clustered = false;
       series3.dataFields.valueY = "pe";
       series3.yAxis = valueAxis3;
-      series3.tooltipText = "{valueY.value}";
+      series3.tooltipText = "滚动市盈率 peTTM {valueY.value}";
       series3.name = "滚动市盈率 peTTM";
       // volume should be summed
       series3.groupFields.valueY = "sum";
@@ -210,7 +210,7 @@ var point_list;
       series4.clustered = false;
       series4.dataFields.valueY = "pb";
       series4.yAxis = valueAxis4;
-      series4.tooltipText = "{valueY.value}";
+      series4.tooltipText = "滚动市现率 pbMRQ {valueY.value}";
       series4.name = "滚动市现率 pbMRQ";
       // volume should be summed
       series4.groupFields.valueY = "sum";
@@ -302,7 +302,7 @@ var point_list;
           field: document.getElementById('fromfield'),
   //        theme: 'dark-theme',
           minDate: new Date(1990, 12, 31),
-          maxDate: new Date(2021, 12, 31),
+          maxDate: new Date(2100, 12, 31),
           onSelect: function() {
               startDate = this.getDate();
               updateStartDate();
@@ -313,7 +313,7 @@ var point_list;
           field: document.getElementById('tofield'),
   //        theme: 'dark-theme',
           minDate: new Date(1990, 12, 31),
-          maxDate: new Date(2021, 12, 31),
+          maxDate: new Date(2100, 12, 31),
           onSelect: function() {
               endDate = this.getDate();
               updateEndDate();
